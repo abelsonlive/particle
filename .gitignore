@@ -12,6 +12,4 @@ pardata.yml
 */*.log
 */*/*.log
 *.rdb
-
-# config
 par_data.yml
