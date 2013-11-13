@@ -1,8 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import sys
-sys.path.append('../')
 
+import os
 import redis
 import yaml
 
@@ -16,6 +15,6 @@ INIT = False
 db = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 # load config
-CONFIG = yaml.safe_load(open('../par_data.yml'))
+CONFIG = yaml.safe_load(open(os.getenv('PARDATA_CONFIG_PATH')))
 
 

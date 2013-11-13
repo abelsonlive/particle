@@ -1,7 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import sys
-sys.path.append('../')
 
 from datetime import datetime, timedelta
 import re
@@ -12,6 +10,7 @@ import requests
 from pprint import pprint
 import string
 import json
+
 
 # debug msg
 def print_output(article_url, time_bucket, value):
@@ -77,7 +76,7 @@ def sluggify(url):
     out = out[:-4].strip()
   return re.sub(r"\s+", "-", out).lower()
 
-def upsert_url(article_url, data_source):
+def upsert_url(article_url, article_slug, data_source):
   if not db.sismember('article_set', article_url):
     # add it to the set
     db.sadd('article_set', article_url)
@@ -86,9 +85,11 @@ def upsert_url(article_url, data_source):
     ts = current_timestamp()
     value = json.dumps({
       "url" : article_url,
+      "slug": article_slug,
       "timestamp" : ts,
       "data_source": data_source
       })
+    
     db.zadd('article_sorted_set', ts, value)
 
 def upsert_rss_pub(article_url, article_slug, value):
@@ -116,73 +117,73 @@ def is_article(link_url):
     return True
 
 def is_short_link(url):
-    re_short_links = [
-        re.compile(r".*bit\.do.*"),
-        re.compile(r".*t\.co.*"),
-        re.compile(r".*go2\.do.*"),
-        re.compile(r".*adf\.ly.*"),
-        re.compile(r".*goo\.gl.*"),
-        re.compile(r".*bitly\.com.*"),
-        re.compile(r".*bit\.ly.*"),
-        re.compile(r".*tinyurl\.com.*"),
-        re.compile(r".*ow\.ly.*"),
-        re.compile(r".*bit\.ly.*"),
-        re.compile(r".*adcrun\.ch.*"),
-        re.compile(r".*zpag\.es.*"),
-        re.compile(r".*ity\.im.*"),
-        re.compile(r".*q\.gs.*"),
-        re.compile(r".*lnk\.co.*"),
-        re.compile(r".*viralurl\.com.*"),
-        re.compile(r".*is\.gd.*"),
-        re.compile(r".*vur\.me.*"),
-        re.compile(r".*bc\.vc.*"),
-        re.compile(r".*yu2\.it.*"),
-        re.compile(r".*twitthis\.com.*"),
-        re.compile(r".*u\.to.*"),
-        re.compile(r".*j\.mp.*"),
-        re.compile(r".*bee4\.biz.*"),
-        re.compile(r".*adflav\.com.*"),
-        re.compile(r".*buzurl\.com.*"),
-        re.compile(r".*xlinkz\.info.*"),
-        re.compile(r".*cutt\.us.*"),
-        re.compile(r".*u\.bb.*"),
-        re.compile(r".*yourls\.org.*"),
-        re.compile(r".*fun\.ly.*"),
-        re.compile(r".*hit\.my.*"),
-        re.compile(r".*nov\.io.*"),
-        re.compile(r".*crisco\.com.*"),
-        re.compile(r".*x\.co.*"),
-        re.compile(r".*shortquik\.com.*"),
-        re.compile(r".*prettylinkpro\.com.*"),
-        re.compile(r".*viralurl\.biz.*"),
-        re.compile(r".*longurl\.org.*"),
-        re.compile(r".*tota2\.com.*"),
-        re.compile(r".*adcraft\.co.*"),
-        re.compile(r".*virl\.ws.*"),
-        re.compile(r".*scrnch\.me.*"),
-        re.compile(r".*filoops\.info.*"),
-        re.compile(r".*linkto\.im.*"),
-        re.compile(r".*vurl\.bz.*"),
-        re.compile(r".*fzy\.co.*"),
-        re.compile(r".*vzturl\.com.*"),
-        re.compile(r".*picz\.us.*"),
-        re.compile(r".*lemde\.fr.*"),
-        re.compile(r".*golinks\.co.*"),
-        re.compile(r".*xtu\.me.*"),
-        re.compile(r".*qr\.net.*"),
-        re.compile(r".*1url\.com.*"),
-        re.compile(r".*tweez\.me.*"),
-        re.compile(r".*sk\.gy.*"),
-        re.compile(r".*gog\.li.*"),
-        re.compile(r".*cektkp\.com.*"),
-        re.compile(r".*v\.gd.*"),
-        re.compile(r".*p6l\.org.*"),
-        re.compile(r".*id\.tl.*"),
-        re.compile(r".*dft\.ba.*"),
-        re.compile(r".*aka\.gr.*")
-    ]
+  re_short_links = [
+    re.compile(r".*bit\.do.*"),
+    re.compile(r".*t\.co.*"),
+    re.compile(r".*go2\.do.*"),
+    re.compile(r".*adf\.ly.*"),
+    re.compile(r".*goo\.gl.*"),
+    re.compile(r".*bitly\.com.*"),
+    re.compile(r".*bit\.ly.*"),
+    re.compile(r".*tinyurl\.com.*"),
+    re.compile(r".*ow\.ly.*"),
+    re.compile(r".*bit\.ly.*"),
+    re.compile(r".*adcrun\.ch.*"),
+    re.compile(r".*zpag\.es.*"),
+    re.compile(r".*ity\.im.*"),
+    re.compile(r".*q\.gs.*"),
+    re.compile(r".*lnk\.co.*"),
+    re.compile(r".*viralurl\.com.*"),
+    re.compile(r".*is\.gd.*"),
+    re.compile(r".*vur\.me.*"),
+    re.compile(r".*bc\.vc.*"),
+    re.compile(r".*yu2\.it.*"),
+    re.compile(r".*twitthis\.com.*"),
+    re.compile(r".*u\.to.*"),
+    re.compile(r".*j\.mp.*"),
+    re.compile(r".*bee4\.biz.*"),
+    re.compile(r".*adflav\.com.*"),
+    re.compile(r".*buzurl\.com.*"),
+    re.compile(r".*xlinkz\.info.*"),
+    re.compile(r".*cutt\.us.*"),
+    re.compile(r".*u\.bb.*"),
+    re.compile(r".*yourls\.org.*"),
+    re.compile(r".*fun\.ly.*"),
+    re.compile(r".*hit\.my.*"),
+    re.compile(r".*nov\.io.*"),
+    re.compile(r".*crisco\.com.*"),
+    re.compile(r".*x\.co.*"),
+    re.compile(r".*shortquik\.com.*"),
+    re.compile(r".*prettylinkpro\.com.*"),
+    re.compile(r".*viralurl\.biz.*"),
+    re.compile(r".*longurl\.org.*"),
+    re.compile(r".*tota2\.com.*"),
+    re.compile(r".*adcraft\.co.*"),
+    re.compile(r".*virl\.ws.*"),
+    re.compile(r".*scrnch\.me.*"),
+    re.compile(r".*filoops\.info.*"),
+    re.compile(r".*linkto\.im.*"),
+    re.compile(r".*vurl\.bz.*"),
+    re.compile(r".*fzy\.co.*"),
+    re.compile(r".*vzturl\.com.*"),
+    re.compile(r".*picz\.us.*"),
+    re.compile(r".*lemde\.fr.*"),
+    re.compile(r".*golinks\.co.*"),
+    re.compile(r".*xtu\.me.*"),
+    re.compile(r".*qr\.net.*"),
+    re.compile(r".*1url\.com.*"),
+    re.compile(r".*tweez\.me.*"),
+    re.compile(r".*sk\.gy.*"),
+    re.compile(r".*gog\.li.*"),
+    re.compile(r".*cektkp\.com.*"),
+    re.compile(r".*v\.gd.*"),
+    re.compile(r".*p6l\.org.*"),
+    re.compile(r".*id\.tl.*"),
+    re.compile(r".*dft\.ba.*"),
+    re.compile(r".*aka\.gr.*")
+  ]
+  return any([r.search(url) for r in re_short_links])
 
-    return any([r.search(url) for r in re_short_links])
 
 def is_facebook_link(link):
   if re.search("facebook", link):
@@ -206,22 +207,38 @@ def unshorten_link(link):
   l = link
   test = test_for_short_link(l)
   if test:
+    tries = 0
     while test:
+      
       try:
         r = requests.get(l)
-      except requests.exceptions.ConnectionError:
+      
+      except Exception as e:
+        print "WARNING: unshorten_link", e
+        
         # quit
         return l
         break
+
       else:
+        
         # quit
         if r.status_code != 200:
           return l
           break
+        
         # give it one more shot!
         else:
           l = r.url
           test = test_for_short_link(l)
+          tries +=1
+          
+          # if we've tried 10 times, give up
+          if tries==10:
+            return l
+            break
+
+    # return link at final state
     return l
   else:
     return link
@@ -231,5 +248,5 @@ def extract_url(s):
     get urls from input string
     """
     pattern = "(https?://[^\s]+)"
-    return [unshorten_link(l) for l in re.findall(pattern, s)]
+    return [unshorten_link(l) for l in re.findall(pattern, s) if len(l)>5]
 

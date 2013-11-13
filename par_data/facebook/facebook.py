@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import sys
-sys.path.append('../../')
+# import sys
+# sys.path.append('../../')
 
 import json
 from thready import threaded
@@ -38,7 +38,7 @@ def get_fb_link(post_data, unshorten=False):
   else:
     return None
 
-def parse_messge_urls(message):
+def parse_message_urls(message):
   """
   parse facebook message for links
   """
@@ -58,7 +58,7 @@ def get_message_urls(article_urls, message):
   if len(article_urls)==0:
     return parse_messge_urls(message)
   elif article_urls[0] is not None and is_facebook_link(article_urls[0]):
-    return parse_messge_urls(message)
+    return parse_message_urls(message)
   else:
     return []
 
@@ -145,11 +145,11 @@ def insert_new_post(post_arg_set):
           
         # always insert insights data
         if is_insights(page_id):
-          print "INFO: fetching insights data for - %s - %s" % (page_id, article_slug)
+          print "INFO\tINSIGHTS\tAdding data from %s re: %s" % (page_id, article_slug)
           # 
           data_source = "facebook_insights_%s" % page_id 
           # upsert url
-          upsert_url(article_url, data_source)
+          upsert_url(article_url, article_slug, data_source)
 
           # insert id
           db.sadd('facebook_post_ids', post_id)
@@ -163,26 +163,20 @@ def insert_new_post(post_arg_set):
             data_source : dict(post_value.items() + insights_value.items())
           })
 
-          if PRINT_OUTPUT:
-            print "INFO: Adding insights data for - %s/%s - %s" % (page_id, post_id, article_slug)
-            # print debug message to console
-            print_output(article_slug, current_time_bucket, value)
-
-          else:
-            # upload data to redis
-            db.zadd(article_slug, current_time_bucket, value)        
+          # upload data to redis
+          db.zadd(article_slug, current_time_bucket, value)        
             
         # only insert new posts
         elif not db.sismember('facebook_post_ids', post_id):
           
-          print "INFO: New Post - %s - %s" % (post_id, article_slug)
+          print "INFO\tFACEBOOK\tnew post %s re: %s" % (post_id, article_slug)
           
           # insert id
           db.sadd('facebook_post_ids', post_id)     
           
           # upsert url
           data_source = "facebook_%s" % page_id
-          upsert_url(article_url, data_source)
+          upsert_url(article_url, article_slug, data_source)
 
           value = json.dumps({
             data_source : dict(post_value.items() + insights_value.items())
@@ -200,7 +194,7 @@ def get_new_data_for_page(page_arg_set):
   """
   api, page_id = page_arg_set
 
-  print "INFO: getting new data for facebook.com/%s" % page_id
+  print "INFO\tFACEBOOK\tgetting new data for facebook.com/%s" % page_id
   
   # fetch account data so we can associate the number of likes with the account AT THAT TIME
   try:

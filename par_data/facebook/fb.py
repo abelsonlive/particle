@@ -1,8 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import sys
-sys.path.append('../../')
 
+import os
 import facepy
 import yaml
 from datetime import datetime, timedelta
@@ -41,17 +40,17 @@ def generate_extended_access_token():
     token = components['access_token'][0]
     expires_at = datetime.now() + timedelta(seconds=int(components['expires'][0]))
 
-    CONFIG['facebook']['stable_access_token'] = token
-    CONFIG['facebook']['stable_access_token_expires_at'] = int(expires_at.strftime("%s"))
-    
-    with open('../par_data.yml', 'wb') as f:
-        f.write(yaml.dump(CONFIG, default_flow_style=False))
-    print "INFO: THIS IS YOUR STABLE ACCESS TOKEN: %s" % token
-    print "INFO: IT EXPIRES AT %s" % expires_at
-    print "INFO: YOUR CONFIG FILE (%s) HAS BEEN UPDATED" % '../par_data.yml'
+    if not CONFIG['facebook'].has_key('stable_access_token'):
+        CONFIG['facebook'].pop('stable_access_token', token)
+        CONFIG['facebook'].pop('stable_access_token_expires_at', int(expires_at.strftime("%s")))
+        
+        with open(os.getenv('PARDATA_CONFIG_PATH'), 'wb') as f:
+            f.write(yaml.dump(CONFIG, default_flow_style=False))
+            print "INFO: THIS IS YOUR STABLE ACCESS TOKEN: %s" % token
+            print "INFO: IT EXPIRES AT %s" % expires_at
+            print "INFO: YOUR CONFIG FILE (%s) HAS BEEN UPDATED" % '../par_data.yml'
 
-def connect(conf="../par_data.yml"):
-    CONFIG = yaml.safe_load(open(conf))
+def connect():
     return facepy.GraphAPI(CONFIG['facebook']['stable_access_token'])
 
 if __name__ == '__main__':

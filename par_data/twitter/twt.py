@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import sys
-sys.path.append('../../')
+# import sys
+# sys.path.append('../../')
 
 import tweepy
 from par_data.common import CONFIG, DEBUG
@@ -26,10 +26,10 @@ def connect():
 
 def generate_list():
 	# parse handles
-	if isinstance(CONFIG['twitter']['screen_names'], basestring):
-		screen_names = [CONFIG['twitter']['screen_names']]
+	if isinstance(CONFIG['twitter']['list_screen_names'], basestring):
+		screen_names = [CONFIG['twitter']['list_screen_names']]
 	else:
-		screen_names = CONFIG['twitter']['screen_names']
+		screen_names = CONFIG['twitter']['list_screen_names']
 
 	api = connect()
 	try:
@@ -38,7 +38,7 @@ def generate_list():
 		api.create_list(slug)
 
 	except tweepy.error.TweepError as e:
-		print "ERROR: %s Already Exists for user " % (slug, owner_screen_name)
+		print "ERROR\tTWT\t%s Already Exists for user %s" % (slug, owner_screen_name)
 		print e
 		return None
 	else:
@@ -52,7 +52,7 @@ def generate_list():
 			except:
 				print "%s doesn't exist" % screen_name
 			else:
-				print "INFO adding %s to list: %s for user: %s" % (screen_name, slug, owner_screen_name)
+				print "INFO\tTWT\tadding %s to list: %s for user: %s" % (screen_name, slug, owner_screen_name)
 
 def get_list_timeline():
 	api = connect()

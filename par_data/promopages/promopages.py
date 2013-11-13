@@ -1,7 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import sys
-sys.path.append('../../')
 
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
@@ -17,35 +15,44 @@ def get_image_for_a_link(link):
     except NoSuchElementException:
         img = None
     if img is not None:
+        w = int(img.get_attribute("width"))
+        h = int(img.get_attribute("height"))
         return dict(
-                is_img = 1,
-                img_width = img.get_attribute("width"),
-                img_height = img.get_attribute("height"),
-                img_src = img.get_attribute("src")
-                )
+                pp_is_img = 1,
+                pp_img_width = w,
+                pp_img_height = h,
+                pp_img_area = w*h,
+                pp_img_src = img.get_attribute("src")
+            )
     else:
-        return dict(is_img=0)
+        return dict(pp_is_img=0)
 
 def scrape_link(link_arg_set):
     promo_url, link, time_bucket, data_source = link_arg_set
+
     try:
         link_url = link.get_attribute("href")
     except StaleElementReferenceException:
         pass
     else:
-        
         # parse link text
         try:
             link_text = link.text.encode('utf-8').strip()
         except:
             link_text = None
+        
+        # det image
+        img_dict = get_image_for_a_link(link)
 
         # tests 
         test_link = link_url is not None and isinstance(link_url, basestring) and is_article(link_url)
-        test_text = link_text is not None and link_text !='' 
-        
-        if all([test_link, test_text]):
-            print link_text
+        test_text = link_text is not None  and link_text is not ''
+        test_image = True if img_dict['pp_is_img']==1 else False
+        test_existence = True if link.location['x'] > 0 or link.location['y'] > 0 else False
+
+        # continue under certain conditions
+        if all([any([test_image, test_text]), test_link, test_existence]):
+
             # parse link
             link_url = link_url.encode('utf-8')
             article_url = parse_url(unshorten_link(link_url))
@@ -54,9 +61,7 @@ def scrape_link(link_arg_set):
             article_slug = sluggify(article_url)
 
             # scrape
-            print "INFO: grabbing promo data for - " + article_slug + " - " + promo_url
-
-            img_dict = get_image_for_a_link(link)
+            print "INFO\tPROMOPAGE\tlink detected on %s re: %s" % (promo_url, article_slug)
 
             link_dict = {
                 'article_slug' : article_slug,
@@ -70,8 +75,6 @@ def scrape_link(link_arg_set):
                 'pp_pos_x' : link.location['x'],
                 'pp_pos_y' : link.location['y']
             }
-            # upsert url
-            upsert_url(article_url, data_source)
             
             value = json.dumps({data_source : dict(img_dict.items() + link_dict.items())})
 
@@ -80,17 +83,25 @@ def scrape_link(link_arg_set):
               print_output(article_slug, time_bucket, value)
               
             else:
+              # upsert url
+              upsert_url(article_url, article_slug, data_source)
               # upload data to redis
               db.zadd(article_slug, time_bucket, value)
 
+
 def scrape_links(links_arg_set):
     b, promo_url, data_source = links_arg_set
-    print "INFO: HITTING %s" % promo_url
+    print "INFO\tPROMOPAGE\t%s" % promo_url
     time_bucket = gen_time_bucket()
     links = b.find_elements_by_tag_name("a")
     link_arg_sets = [(promo_url, l, time_bucket, data_source) for l in links]
     for link_arg_set in link_arg_sets:
-        scrape_link(link_arg_set)
+        try:
+            scrape_link(link_arg_set)
+        except StaleElementReferenceException as e:
+            print "WARNING\t", e
+            continue
+
 
 def scrape_promo_page(page_arg_set):
     promo_url, data_source = page_arg_set
@@ -107,5 +118,5 @@ def run():
       scrape_promo_page(page_arg_set)
   else:
     page_arg_sets = [(url, slug) for slug, url in pages.iteritems()]
-    threaded(page_arg_sets, scrape_promo_page, 2, 2)
+    threaded(page_arg_sets, scrape_promo_page, 2, 10)
       

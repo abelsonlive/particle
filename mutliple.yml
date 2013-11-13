@@ -1,0 +1,47 @@
+global:
+  bucket: 10
+  content_regexes:
+  - .*\.nytimes\.com/(.*/)?[0-9]+/[0-9]+/[0-9]+/.*
+  short_regexes:
+  - nyti\.ms/\w+
+  newsroom_timezone: America/New_York
+
+twitter:
+  access_token: 432708845-pbFEkKpuZJrctSm92Lg7fvjcSVClaEWK3DkASXes
+  access_token_secret: deLWDJYFOSEVudcoa5qxlGXgCkxkbsVC4Vcm0O6F18
+  consumer_key: mtnrOisl1Yn4ZaIdUGi4g
+  consumer_secret: M36KN7KWgZqsXYF3SG1LGBxmuRIfGsa2miZiqCk60
+  limit: 200
+  list_owner: brianabelson
+  list_slug: pardata-test
+  list_screen_names:
+  - nytimes
+  - nytimesworld
+
+facebook:
+  app_id: '212394585607604'
+  app_secret: 826ba639c8efcf7d5ff3bfefb52e16fb
+  stable_access_token: CAADBKZCfTzbQBAIvZCbP1HRQZArN0x0ah1IzNnuMfOCc85z3Qr42xwBbuZC4D0bPCvgDTrWGgTjHZAsScTpbGFR7izJsmQgnylUbro5zt4w5ZAraECCe5b8k3RqXMj0jvYcYzKHHliL0lrj6levEkkguOXtSrbjozfprNxvUbfrFtj9cvXwQYRhnW3bodAc3QZD
+  stable_access_token_expires_at: 1389459956
+  temp_access_token: CAADBKZCfTzbQBAFm3CuMvbYJ853dUW7UeOE0vKdvSZBRgfi9Y5rZCndOus45yRQIfq1N0ZAqnRJpQSWiAD8EwyXrZCiLDfGUoP8vM5xLmQZBLBhamWZBdALnfcbAzgLHAzxc02tiWs8HTteDvav4GLPa4ZCa11rMhbOlJASfqXWuKyPLNzfMDQ3CXjg3ACNVLwEZD
+  insights_limit: 100
+  insights_pages:
+  - nytimes
+  page_limit: 10
+  pages:
+  - nytimes
+
+promopages:
+    drudge_report: http://drudgereport.com
+    google_news: http://reddit.com/
+    hacker_news: http://news.ycombinator.com
+    # nyt_homepage: http://nytimes.com/
+    nyt_mobile: http://mobile.nytimes.com
+    nyt_most_emailed: http://www.nytimes.com/most-popular-emailed
+
+rssfeeds:
+  nyt_timeswire:
+    full_text: False
+    feed_url: http://www.nytimes.com/timeswire/feeds/
+
+

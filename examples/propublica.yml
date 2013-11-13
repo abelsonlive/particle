@@ -1,0 +1,42 @@
+global:
+  bucket: 10
+  content_regexes:
+  - .*propublica.org/[a-z]+/[a-z0-9/-]+
+  short_regexes:
+  - propub\.ca/\w+
+  newsroom_timezone: America/New_York
+
+twitter:
+  access_token: www
+  access_token_secret: xxx
+  consumer_key: yyy
+  consumer_secret: zzz
+  limit: 200
+  list_owner: brianabelson
+  list_slug: pardata-propublica-test
+  list_screen_names:
+  - propublica
+  - propubnerds
+  - amzam
+
+facebook:
+  app_id: 1234
+  app_secret: abdc
+  stable_access_token: 
+  stable_access_token_expires_at: 1389459956
+  temp_access_token: jklmno
+  pages:
+  - propublica
+  page_limit: 100
+  insights_pages:
+    - 
+
+promopages:
+  propublica_homepage: http://www.propublica.org/
+
+rssfeeds:
+  rss_propublica:
+    feed_url: http://feeds.propublica.org/propublica/main?format=xml
+    full_text: True
+
+

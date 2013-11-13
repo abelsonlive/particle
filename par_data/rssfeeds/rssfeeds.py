@@ -1,7 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import sys
-sys.path.append('../../')
 
 import feedparser
 from thready import threaded
@@ -37,74 +35,73 @@ def parse_one_entry(entry_arg_set):
   """
   entry, data_source, full_text = entry_arg_set
 
-  # extract parse, sluggify url
+  # open url to get actual link
   r = requests.get(entry['link'])
   if r.status_code == 200:
+    # parse and sluggify url
     article_url = parse_url(r.url)
     article_slug = sluggify(article_url)
+
   else:
     article_url = None
     article_slug = None
 
-  # upsert article_url
-  upsert_url(article_url, data_source)
+  # check if this key exists
+  if not db.exists(article_slug + ":article"):
 
-  # parse date
-  dt = parse_rss_date(entry)
-  if dt is not None:
-    time_bucket = round_datetime(dt)
-    raw_timestamp = int(dt.strftime('%s'))
-    pub_date = dt.strftime('%Y-%m-%d %H:%M:%S')
+    # parse date
+    dt = parse_rss_date(entry)
+    if dt is not None:
+      time_bucket = round_datetime(dt)
+      raw_timestamp = int(dt.strftime('%s'))
+      pub_date = dt.strftime('%Y-%m-%d %H:%M:%S')
 
-  else:
-    time_bucket = gen_time_bucket()
-    raw_timestamp = current_timestamp()
-    pub_date = None
+    else:
+      time_bucket = gen_time_bucket()
+      raw_timestamp = current_timestamp()
+      pub_date = None
 
-  # parse_title
-  if entry.has_key('title'):
-    rss_title = entry['title']
-  else:
-    rss_title = None
+    # parse_title
+    if entry.has_key('title'):
+      rss_title = entry['title']
+    else:
+      rss_title = None
 
-  # parse content
-  if entry.has_key('summary'):
-    rss_content = strip_tags(entry['summary'])
-  else:
-    rss_content = None
+    # parse content
+    if entry.has_key('summary'):
+      rss_content = strip_tags(entry['summary'])
+    else:
+      rss_content = None
 
-  # rss datum
-  rss_datum = dict(
-    article_slug = article_slug,
-    article_url = article_url,
-    time_bucket = time_bucket,
-    raw_timestamp = raw_timestamp,
-    rss_pub_date = pub_date,
-    rss_raw_link = r.url,
-    rss_title = rss_title,
-    rss_content = rss_content
-  )
+    # rss datum
+    rss_datum = dict(
+      article_slug = article_slug,
+      article_url = article_url,
+      time_bucket = time_bucket,
+      raw_timestamp = raw_timestamp,
+      rss_pub_date = pub_date,
+      rss_raw_link = r.url,
+      rss_title = rss_title,
+      rss_content = rss_content
+    )
 
-# if feed is not full text, extract the article content
-  # by crawling the page
-  if not full_text:
-    article_datum = extract_article(article_url)
-  else:
-    article_datum = {}
+  # if feed is not full text, extract the article content
+    # by crawling the page
+    if not full_text:
+      article_datum = extract_article(article_url)
+    else:
+      article_datum = {}
 
-  # merge data
-  complete_datum = dict(
-    rss_datum.items() + 
-    article_datum.items()
-  )
-  
-  # value
-  data_source = "rss_" + data_source 
-  print data_source, article_slug, time_bucket
-  value = json.dumps({data_source: complete_datum})
-
-  # upsert the data
-  upsert_rss_pub(article_url, article_slug, value)
+    # merge data
+    complete_datum = dict(
+      rss_datum.items() + 
+      article_datum.items()
+    )
+    
+    value = json.dumps({data_source: complete_datum})
+    print "INFO\tRSSFEEDS\tNEW POST on %s re: %s" % (data_source, article_url)
+    # upsert the data
+    upsert_rss_pub(article_url, article_slug, value)
   
 
 def parse_one_feed(feed_arg_set):
@@ -112,7 +109,7 @@ def parse_one_feed(feed_arg_set):
   """
   parse all the items in an rss feed
   """
-  print "INFO: parsing %s\n" % feed_url
+  
   feed_data = feedparser.parse(feed_url)
   
   entries = feed_data['entries']

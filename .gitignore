@@ -13,3 +13,4 @@ pardata.yml
 */*/*.log
 *.rdb
 par_data.yml
+dev/

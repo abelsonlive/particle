@@ -39,10 +39,7 @@ promopages:
     nyt_mobile: http://mobile.nytimes.com
     nyt_most_emailed: http://www.nytimes.com/most-popular-emailed
 
-rssfeeds:
-  nyt_timeswire:
-    full_text: False
-    feed_url: http://www.nytimes.com/timeswire/feeds/
+
   pro_publica:
     feed_url: http://feeds.propublica.org/propublica/main?format=xml
     full_text: True

@@ -1,9 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import sys
-sys.path.append('../../')
 
-# -*- coding: utf-8 -*-
 from boilerpipe.extract import Extractor
 from readability.readability import Document
 import requests
@@ -47,16 +44,16 @@ def extract_article(url):
     html = r.content.decode('utf-8', errors='ignore')
 
     # run boilerpipe
-    # boilerpipe_extractor = Extractor(html=html)
+    BP = Extractor(html=html)
 
     # run readability
-    readability_extractor = Document(html)
+    Rdb = Document(html)
 
-    html = readability_extractor.summary()
+    html = Rdb.summary()
     # return article data
     return {
-      'extracted_title': readability_extractor.short_title(),
-      'extracted_content': strip_tags(html).encode('utf-8', errors='ignore'),
+      'extracted_title': strip_tags(BP.getText()),
+      'extracted_content': Rdb.short_title().strip(),
     }
 
   # otherwise return an empty dict

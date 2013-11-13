@@ -1,14 +1,16 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import sys
-sys.path.append('../../')
+# import sys
+# sys.path.append('../../')
 import json
 import tweepy
 from thready import threaded
 from datetime import datetime
+from par_data.core import core_init
 from par_data.twitter import twt
 from par_data.common import db, CONFIG, DEBUG, PRINT_OUTPUT
 from par_data.helpers import *
+
 
 TWT_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
@@ -44,7 +46,7 @@ def parse_tweet(t):
         # sluggify url
         article_slug = sluggify(article_url)
         screen_name = t.user.screen_name
-        print "INFO: New Tweet - %s/%s - %s" % (screen_name, twt_id, article_slug)
+        print "INFO\tTWITTER\tNew Tweet %s/%s re: %s" % (screen_name, twt_id, article_slug)
 
       # format data
         value = {
@@ -68,7 +70,7 @@ def parse_tweet(t):
         
         data_source = "twitter_%s" % value['twt_screen_name'] 
         # upsert url
-        upsert_url(article_url, data_source)
+        upsert_url(article_url, article_slug, data_source)
 
         value = json.dumps({ data_source : value})
         
@@ -90,7 +92,7 @@ def parse_tweets(tweets):
 def run():
     list_owner = CONFIG['twitter']['list_owner']
     list_slug = CONFIG['twitter']['list_slug']
-    print "INFO: getting new data for twitter.com/%s/lists/%s" % (list_owner, list_slug)
+    print "INFO\tTWITTER\tgetting new data for twitter.com/%s/lists/%s" % (list_owner, list_slug)
     try:
         tweets = [t for t in twt.get_list_timeline()]
     except tweepy.error.TweepError as e:
