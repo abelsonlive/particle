@@ -5,3 +5,8 @@ redis
 pytz
 selenium
 flask
+thready
+feedparser
+python-dateutil
+git+git://github.com/misja/python-boilerpipe.git
+readability-lxml

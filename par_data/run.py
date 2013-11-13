@@ -60,5 +60,9 @@ def run():
 
 
 if __name__ == '__main__':
-    run()
+    import sys
+    try:
+      config(sys.argv[1])
+    except:
+      run()
 
