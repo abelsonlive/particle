@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from thready import threaded
-import json, yaml
+import json, yaml, os
 from optparse import OptionParser
 
 from par_data.facebook import facebook
@@ -13,7 +13,9 @@ from par_data.facebook import fb
 from par_data.twitter import twt
 from par_data.common import DEBUG, db, INIT
 
-def config(filepath, config):
+def config(filepath, config=None):
+  cwd = os.getcwd()
+  filepath = os.path.join(cwd, filepath.split("/")[-1])
   # initialize config file
   if config is None:
     if filepath.endswith('.yml'):
@@ -25,14 +27,14 @@ def config(filepath, config):
   elif isinstance(config, dict):
       format = 'yaml'
       c = config
-
+  print filepath
   # set environmental variable
   os.environ['PARDATA_CONFIG_PATH'] = filepath
 
   # write to file:
   with open(filepath, 'wb') as f:
     if format == 'yaml':
-      f.write(yaml.dumps(c, indent =2, default_flow_style=False))
+      f.write(yaml.dump(c, indent =2, default_flow_style=False))
     elif format == 'json':
       f.write(json.dumps(c, indent = 2, sort_keys=False))
 
@@ -49,7 +51,7 @@ def run():
     twitter,
     facebook
   ]
-  print("\n\n")
+  print("\n----------------------------------\n")
   if DEBUG:
     for task in tasks:
       execute(task)

@@ -19,28 +19,27 @@ def generate_extended_access_token():
     Returns a tuple with a string describing the extended access token and a datetime instance
     describing when it expires.
     """
-
-    # access tokens
-    default_access_token = facepy.get_application_access_token(
-        application_id = CONFIG['facebook']['app_id'],  
-        application_secret_key = CONFIG['facebook']['app_secret']
-    )
-    graph = facepy.GraphAPI(default_access_token)
-
-    response = graph.get(
-        path='oauth/access_token',
-        client_id = CONFIG['facebook']['app_id'],
-        client_secret = CONFIG['facebook']['app_secret'],
-        grant_type = 'fb_exchange_token',
-        fb_exchange_token = CONFIG['facebook']['temp_access_token']
-    )
-
-    components = parse_qs(response)
-
-    token = components['access_token'][0]
-    expires_at = datetime.now() + timedelta(seconds=int(components['expires'][0]))
-
     if not CONFIG['facebook'].has_key('stable_access_token'):
+        # access tokens
+        default_access_token = facepy.get_application_access_token(
+            application_id = CONFIG['facebook']['app_id'],  
+            application_secret_key = CONFIG['facebook']['app_secret']
+        )
+        graph = facepy.GraphAPI(default_access_token)
+
+        response = graph.get(
+            path='oauth/access_token',
+            client_id = CONFIG['facebook']['app_id'],
+            client_secret = CONFIG['facebook']['app_secret'],
+            grant_type = 'fb_exchange_token',
+            fb_exchange_token = CONFIG['facebook']['temp_access_token']
+        )
+
+        components = parse_qs(response)
+
+        token = components['access_token'][0]
+        expires_at = datetime.now() + timedelta(seconds=int(components['expires'][0]))
+
         CONFIG['facebook'].pop('stable_access_token', token)
         CONFIG['facebook'].pop('stable_access_token_expires_at', int(expires_at.strftime("%s")))
         
