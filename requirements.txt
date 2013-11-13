@@ -1,0 +1,7 @@
+tweepy
+facepy
+pyyaml
+pyredis
+pytz
+selenium
+flask

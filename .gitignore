@@ -1,0 +1,17 @@
+# crud
+.DS_Store
+*/.DS_Store
+*/*/.DS_Store
+*.pyc
+*/*.pyc
+*/*/*.pyc
+build/
+dist/
+*.egg-info
+pardata.yml
+*/*.log
+*/*/*.log
+*.rdb
+
+# config
+par_data.yml
