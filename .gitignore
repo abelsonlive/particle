@@ -9,6 +9,7 @@ build/
 dist/
 *.egg-info
 pardata.yml
+*.log
 */*.log
 */*/*.log
 *.rdb
