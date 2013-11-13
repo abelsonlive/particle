@@ -25,7 +25,7 @@ def run(init=INIT):
     db.zadd('article_sorted_set', 0, json.dumps(dict(url=None)))
 
   tasks = [
-    # internal_facebook,
+    internal_facebook,
     internal_twitter,
     promopages
   ]
