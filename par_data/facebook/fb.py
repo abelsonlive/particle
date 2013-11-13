@@ -44,11 +44,12 @@ def generate_extended_access_token():
         CONFIG['facebook'].pop('stable_access_token', token)
         CONFIG['facebook'].pop('stable_access_token_expires_at', int(expires_at.strftime("%s")))
         
-        with open(os.getenv('PARDATA_CONFIG_PATH'), 'wb') as f:
+        fp = os.getenv('PARDATA_CONFIG_PATH')
+        with open(fp, 'wb') as f:
             f.write(yaml.dump(CONFIG, default_flow_style=False))
             print "INFO: THIS IS YOUR STABLE ACCESS TOKEN: %s" % token
             print "INFO: IT EXPIRES AT %s" % expires_at
-            print "INFO: YOUR CONFIG FILE (%s) HAS BEEN UPDATED" % '../par_data.yml'
+            print "INFO: YOUR CONFIG FILE (%s) HAS BEEN UPDATED" % fp
 
 def connect():
     return facepy.GraphAPI(CONFIG['facebook']['stable_access_token'])
