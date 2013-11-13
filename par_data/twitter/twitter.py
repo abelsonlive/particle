@@ -1,16 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# import sys
-# sys.path.append('../../')
+
 import json
 import tweepy
 from thready import threaded
 from datetime import datetime
-from par_data.core import core_init
 from par_data.twitter import twt
 from par_data.common import db, CONFIG, DEBUG, PRINT_OUTPUT
 from par_data.helpers import *
-
 
 TWT_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 

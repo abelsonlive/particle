@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from thready import threaded
-import json
+import json, yaml
 from optparse import OptionParser
 
 from par_data.facebook import facebook
