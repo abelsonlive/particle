@@ -16,10 +16,10 @@ def parse_tweet(t):
 
   # check if id exists
   twt_id = t.id_str
-  if not db.sismember('internal_twitter_twt_ids', twt_id):
+  if not db.sismember('twitter_twt_ids', twt_id):
 
     # if not, add id to id_set
-    db.sadd('internal_twitter_twt_ids', twt_id)
+    db.sadd('twitter_twt_ids', twt_id)
     # check for relevant urls
     raw_urls = [u['expanded_url'] for u in t.entities['urls']]
     if any([is_article(u) for u in raw_urls]):
@@ -85,7 +85,7 @@ def parse_tweets(tweets):
       for t in tweets:
         parse_tweet(t)
     else:
-      threaded(tweets, parse_tweet, 2, 10)
+      threaded(tweets, parse_tweet, 30, 200)
 
 def run():
     list_owner = CONFIG['twitter']['list_owner']

@@ -91,6 +91,13 @@ def upsert_url(article_url, data_source):
       })
     db.zadd('article_sorted_set', ts, value)
 
+def upsert_rss_pub(article_url, article_slug, value):
+  if not db.sismember('article_set', article_url):
+    # add it to the set
+    db.sadd('article_set', article_url)
+  key = "%s:article" % article_slug
+  db.set(key, value)
+
 # urls
 def parse_url(url):
   """

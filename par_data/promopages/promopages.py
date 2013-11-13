@@ -26,15 +26,26 @@ def get_image_for_a_link(link):
     else:
         return dict(is_img=0)
 
-def scrape_link(arg_set):
-    promo_url, link, time_bucket, data_source = arg_set
+def scrape_link(link_arg_set):
+    promo_url, link, time_bucket, data_source = link_arg_set
     try:
         link_url = link.get_attribute("href")
     except StaleElementReferenceException:
         pass
     else:
-        test = link_url is not None and isinstance(link_url, basestring) and is_article(link_url)
-        if test:
+        
+        # parse link text
+        try:
+            link_text = link.text.encode('utf-8').strip()
+        except:
+            link_text = None
+
+        # tests 
+        test_link = link_url is not None and isinstance(link_url, basestring) and is_article(link_url)
+        test_text = link_text is not None and link_text !='' 
+        
+        if all([test_link, test_text]):
+            print link_text
             # parse link
             link_url = link_url.encode('utf-8')
             article_url = parse_url(unshorten_link(link_url))
@@ -54,7 +65,7 @@ def scrape_link(arg_set):
                 'raw_timestamp': int(datetime.now().strftime("%s")),
                 'pp_promo_url' : promo_url,
                 'pp_link_url': link_url,
-                'pp_headline' : link.text.encode('utf-8').strip(),
+                'pp_headline' : link_text,
                 'pp_font_size' : link.value_of_css_property('font-size'),
                 'pp_pos_x' : link.location['x'],
                 'pp_pos_y' : link.location['y']
@@ -85,8 +96,8 @@ def scrape_promo_page(page_arg_set):
     promo_url, data_source = page_arg_set
     b = webdriver.PhantomJS()
     b.get(promo_url)
-    arg_set = (b, promo_url, data_source)
-    scrape_links(arg_set)
+    links_arg_set = (b, promo_url, data_source)
+    scrape_links(links_arg_set)
 
 def run():
   pages = CONFIG['promopages']

@@ -21,7 +21,7 @@ def is_insights(page_id):
   return page_id in set(CONFIG['facebook']['insights_pages'])
 
 # link parsing
-def get_fb_link(post_data, unshorten=True):
+def get_fb_link(post_data, unshorten=False):
   """
   parse fb_post data for links
   """
@@ -66,7 +66,7 @@ def get_insights_data(api, page_id, post_id):
   """
   Get insights data if indicated so by the config file
   """
-  if is_insights(page_id):
+  if not is_insights(page_id):
     return {}
   else:  
     graph_results = api.get(post_id + "/insights", page=False, retry=5)
@@ -103,18 +103,17 @@ def insert_new_post(post_arg_set):
       date_time = tz_adj(dt)
       time_bucket = round_datetime(date_time)
       raw_timestamp = int(date_time.strftime("%s"))
+    
     else:
       time_bucket = None
       raw_timestamp = None
     
-    # extract message and potential so we can find links within the msg if not in url
-    # fields
-    message = post_data['message'].encode('utf-8') if post_data.has_key('message') else None
+    # extract message so we can find links within the msg if not in url
     article_urls = [get_fb_link(post_data, unshorten=True)]
-    link_raw = get_fb_link(post_data, unshorten=False)
+    message = post_data['message'].encode('utf-8') if post_data.has_key('message') else None
     message_urls = get_message_urls(article_urls, message)
 
-    # unshorten
+    # detect article links, unshorten and parse
     article_urls = [
       parse_url(unshorten_link(article_url)) \
       for article_url in article_urls + message_urls
@@ -123,8 +122,6 @@ def insert_new_post(post_arg_set):
 
     if article_urls:
       for article_url in set(article_urls):
-        # upsert url
-        upsert_url(article_url)
 
         # sluggify url
         article_slug = sluggify(article_url)
@@ -136,6 +133,7 @@ def insert_new_post(post_arg_set):
           'time_bucket': time_bucket,
           'fb_post_created': time_bucket,
           'raw_timestamp': raw_timestamp,
+          'fb_raw_link' : get_fb_link(post_data),
           'fb_page_id': page_id,
           'fb_post_id': post_id,
           'fb_page_likes': acct_data['likes'] if acct_data.has_key('likes') else None,
@@ -144,22 +142,21 @@ def insert_new_post(post_arg_set):
           'fb_status_type': post_data['status_type'] if post_data.has_key('status_type') else None,
           'fb_message': message
         }
-
-        data_source = "facebook_%s" % page_id
-              
+          
         # always insert insights data
         if is_insights(page_id):
+          print "INFO: fetching insights data for - %s - %s" % (page_id, article_slug)
           # 
-          data_source += "_insights" 
+          data_source = "facebook_insights_%s" % page_id 
           # upsert url
           upsert_url(article_url, data_source)
 
           # insert id
-          db.sadd('internal_facebook_post_ids', post_id)
+          db.sadd('facebook_post_ids', post_id)
 
           # format time bucket
           current_time_bucket = gen_time_bucket()
-          insights_value['time_bucket'] = current_time_bucket
+          insights_value.pop('time_bucket', current_time_bucket)
           post_value.pop('time_bucket', None)
           
           value = json.dumps({
@@ -172,20 +169,20 @@ def insert_new_post(post_arg_set):
             print_output(article_slug, current_time_bucket, value)
 
           else:
-            print "INFO: Adding insights data for - %s/%s - %s" % (page_id, post_id, article_slug)
-            
             # upload data to redis
             db.zadd(article_slug, current_time_bucket, value)        
             
-
         # only insert new posts
-        elif not db.sismember('internal_facebook_post_ids', post_id):
+        elif not db.sismember('facebook_post_ids', post_id):
+          
           print "INFO: New Post - %s - %s" % (post_id, article_slug)
-          # upsert url
-          upsert_url(article_url, data_source)
-
+          
           # insert id
-          db.sadd('internal_facebook_post_ids', post_id)
+          db.sadd('facebook_post_ids', post_id)     
+          
+          # upsert url
+          data_source = "facebook_%s" % page_id
+          upsert_url(article_url, data_source)
 
           value = json.dumps({
             data_source : dict(post_value.items() + insights_value.items())
@@ -226,7 +223,7 @@ def get_new_data_for_page(page_arg_set):
         insert_new_post(post_arg_set)
     else:
       post_arg_sets = [(api, post_data, acct_data, page_id) for post_data in page['data']]
-      threaded(post_arg_sets, insert_new_post, 10, 100)
+      threaded(post_arg_sets, insert_new_post, 20, 150)
 
 def run():
   """
@@ -241,7 +238,7 @@ def run():
   # fetch account data so we can associate the number of likes with the account AT THAT TIME
   else:
     page_arg_sets = [(api, page_id) for page_id in page_ids]
-    threaded(page_arg_sets, get_new_data_for_page, 5, 10)
+    threaded(page_arg_sets, get_new_data_for_page, 5, 20)
 
 if __name__ == '__main__':
   run()
