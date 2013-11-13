@@ -6,7 +6,7 @@
 import json
 from thready import threaded
 
-from par_data.common import db, CONFIG, DEBUG, PRINT_OUTPUT
+from par_data.common import db, CONFIG, DEBUG
 from par_data.facebook import fb
 from par_data.helpers import *
 from pprint import pprint
@@ -182,11 +182,8 @@ def insert_new_post(post_arg_set):
             data_source : dict(post_value.items() + insights_value.items())
           })
 
-          if PRINT_OUTPUT:
-            print_output(article_slug, time_bucket, value)
-          else:
-            # upload data to redis
-            db.zadd(article_slug, time_bucket, value)
+          # upload data to redis
+          db.zadd(article_slug, time_bucket, value)
 
 def get_new_data_for_page(page_arg_set):
   """

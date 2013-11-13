@@ -6,7 +6,7 @@ import tweepy
 from thready import threaded
 from datetime import datetime
 from par_data.twitter import twt
-from par_data.common import db, CONFIG, DEBUG, PRINT_OUTPUT
+from par_data.common import db, CONFIG, DEBUG
 from par_data.helpers import *
 
 TWT_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -71,13 +71,8 @@ def parse_tweet(t):
 
         value = json.dumps({ data_source : value})
         
-        if PRINT_OUTPUT:
-          # print debug message to console
-          debug_message(article_slug, time_bucket, value)
-          
-        else:
-          # upload data to redis
-          db.zadd(article_slug, time_bucket, value)
+        # add data to redis
+        db.zadd(article_slug, time_bucket, value)
 
 def parse_tweets(tweets):
     if DEBUG:

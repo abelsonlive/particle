@@ -6,7 +6,6 @@ import redis
 import yaml
 
 # defaults
-PRINT_OUTPUT = False
 DEBUG = False
 APP_DEBUG = True
 INIT = False

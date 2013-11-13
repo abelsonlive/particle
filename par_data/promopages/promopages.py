@@ -3,7 +3,7 @@
 
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
-from par_data.common import db, CONFIG, DEBUG, PRINT_OUTPUT
+from par_data.common import db, CONFIG, DEBUG
 from par_data.helpers import *
 from datetime import datetime, timedelta
 from thready import threaded
@@ -56,7 +56,7 @@ def scrape_link(link_arg_set):
             # parse link
             link_url = link_url.encode('utf-8')
             article_url = parse_url(unshorten_link(link_url))
-        
+
             # sluggify
             article_slug = sluggify(article_url)
 
@@ -75,18 +75,13 @@ def scrape_link(link_arg_set):
                 'pp_pos_x' : link.location['x'],
                 'pp_pos_y' : link.location['y']
             }
-            
+
             value = json.dumps({data_source : dict(img_dict.items() + link_dict.items())})
 
-            if PRINT_OUTPUT:
-              # print debug message to console
-              print_output(article_slug, time_bucket, value)
-              
-            else:
-              # upsert url
-              upsert_url(article_url, article_slug, data_source)
-              # upload data to redis
-              db.zadd(article_slug, time_bucket, value)
+            # upsert url
+            upsert_url(article_url, article_slug, data_source)
+            # upload data to redis
+            db.zadd(article_slug, time_bucket, value)
 
 
 def scrape_links(links_arg_set):

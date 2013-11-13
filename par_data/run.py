@@ -13,13 +13,31 @@ from par_data.facebook import fb
 from par_data.twitter import twt
 from par_data.common import DEBUG, db, INIT
 
-def init():
+def config(filepath, config):
+  # initialize config file
+  if config is None:
+    if filepath.endswith('.yml'):
+      format ='yaml'
+      c = yaml.safe_load(open(filepath))
+    elif filepah.endswith('.json'):
+      format = 'json'
+      c = yaml.safe_load(open(filepath))
+  elif isinstance(config, dict):
+      format = 'yaml'
+      c = config
+
+  # set environmental variable
+  os.environ['PARDATA_CONFIG_PATH'] = filepath
+
+  # write to file:
+  with open(filepath, 'wb') as f:
+    if format == 'yaml':
+      f.write(yaml.dumps(c, indent =2, default_flow_style=False))
+    elif format == 'json':
+      f.write(json.dumps(c, indent = 2, sort_keys=False))
+
   fb.generate_extended_access_token()
   twt.generate_list()
-  db.sadd('twitter_twt_ids', None)
-  db.sadd('facebook_post_ids', None)
-  db.sadd('article_set', None)
-  db.zadd('article_sorted_set', 0, json.dumps(dict(url=None)))
 
 def execute(task):
   task.run()
@@ -40,11 +58,5 @@ def run():
 
 
 if __name__ == '__main__':
-  parser = OptionParser()
-  parser.add_option("-i", "--init", dest="init", default="false")
-  opts, args = parser.parse_args()
-  if opts.init =='true':
-    init()
-  else:
     run()
 
