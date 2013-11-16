@@ -3,7 +3,8 @@
 
 from datetime import datetime, timedelta
 import re
-from par_data.common import CONFIG, db
+from particle.common import CONFIG, db
+from HTMLParser import HTMLParser
 from urlparse import urlparse
 import pytz
 import requests
@@ -115,6 +116,23 @@ def is_article(link_url):
     return any([re.search(pattern, link_url) for pattern in patterns])
   else:
     return True
+
+# html stripping
+class MLStripper(HTMLParser):
+    def __init__(self):
+        self.reset()
+        self.fed = []
+    def handle_data(self, d):
+        self.fed.append(d)
+    def get_data(self):
+        return ''.join(self.fed)
+
+def strip_tags(html):
+    s = MLStripper()
+    s.feed(html)
+    raw_text = s.get_data()
+    raw_text = re.sub(r'\n|\t', ' ', raw_text)
+    return re.sub('\s+', ' ', raw_text).strip()
 
 def is_short_link(url):
   re_short_links = [

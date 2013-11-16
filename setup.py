@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='par_data',
+    name='particle',
     version='0.0.2',
     description="",
     long_description="",
@@ -15,7 +15,7 @@ setup(
     keywords='',
     author='Brian Abelson',
     author_email='',
-    url='http://github.com/abelsonlive/par_data',
+    url='http://github.com/abelsonlive/particle',
     license='MIT',
     packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
     namespace_packages=[],

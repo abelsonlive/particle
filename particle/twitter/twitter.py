@@ -5,9 +5,9 @@ import json
 import tweepy
 from thready import threaded
 from datetime import datetime
-from par_data.twitter import twt
-from par_data.common import db, CONFIG, DEBUG
-from par_data.helpers import *
+from particle.twitter import twt
+from particle.common import db, CONFIG, DEBUG
+from particle.helpers import *
 
 TWT_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 

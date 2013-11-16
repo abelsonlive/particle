@@ -8,10 +8,9 @@
 build/
 dist/
 *.egg-info
-pardata.yml
+particle.yml
 *.log
 */*.log
 */*/*.log
 *.rdb
-par_data.yml
 dev/

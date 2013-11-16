@@ -9,9 +9,9 @@ import json
 import requests
 
 # custom modules:
-from par_data.common import db, DEBUG, CONFIG
-from par_data.rssfeeds.article_extractor import extract_article, strip_tags
-from par_data.helpers import *
+from particle.common import db, DEBUG, CONFIG
+from particle.rssfeeds.article_extractor import extract_article
+from particle.helpers import *
 
 def parse_rss_date(entry):
   if entry.has_key('updated_parsed'):

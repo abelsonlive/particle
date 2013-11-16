@@ -3,8 +3,8 @@ import redis
 import json
 from flask import request
 import dateutil.parser
-from par_data.helpers import *
-from par_data.common import db, CONFIG, APP_DEBUG
+from particle.helpers import *
+from particle.common import db, CONFIG, APP_DEBUG
 
 app = flask.Flask(__name__)
 
@@ -35,14 +35,6 @@ def jsonify(obj, status=200, headers=None):
     return Response(jsondata, headers=headers,
                     status=status, mimetype='application/json')
 
-# data_sources = [
-#   'internal_facebook',
-#   'internal_facebook_insights',
-#   'internal_twitter',
-#   'internal_pages',
-#   'external_pages'
-# ]
-
 @app.route("/")
 def query():
 
@@ -52,8 +44,8 @@ def query():
   start = request.args.get('start', 0)
   end = request.args.get('end', 1e11)
   order = request.args.get('order', 'desc')
-  include_article = request.args.get('order', 'true')
-  include_keys = request.args.get('include_keys', 'true')
+  include_article = request.args.get('order', 'true').lower()
+  include_keys = request.args.get('include_keys', 'true').lower()
   
   # pesky boolian problem
   if include_keys=='true':

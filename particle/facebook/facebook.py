@@ -6,9 +6,9 @@
 import json
 from thready import threaded
 
-from par_data.common import db, CONFIG, DEBUG
-from par_data.facebook import fb
-from par_data.helpers import *
+from particle.common import db, CONFIG, DEBUG
+from particle.facebook import fb
+from particle.helpers import *
 from pprint import pprint
 from datetime import datetime
 

@@ -1,4 +1,4 @@
-import par_data.run as PP
+import particle.run as PP
 
 PP.config('propublica.yml')
 PP.run()

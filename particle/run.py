@@ -5,19 +5,19 @@ from thready import threaded
 import json, yaml, os
 from optparse import OptionParser
 
-from par_data.facebook import facebook
-from par_data.twitter import twitter
-from par_data.promopages import promopages
-from par_data.rssfeeds import rssfeeds
-from par_data.facebook import fb
-from par_data.twitter import twt
-from par_data.common import DEBUG, db, INIT
+from particle.facebook import facebook
+from particle.twitter import twitter
+from particle.promopages import promopages
+from particle.rssfeeds import rssfeeds
+from particle.facebook import fb
+from particle.twitter import twt
+from particle.common import DEBUG, db
 
-def config(filepath, config=None):
+def init(filepath, obj=None):
   cwd = os.getcwd()
   filepath = os.path.join(cwd, filepath.split("/")[-1])
   # initialize config file
-  if config is None:
+  if obj is None:
     if filepath.endswith('.yml'):
       format ='yaml'
       c = yaml.safe_load(open(filepath))
@@ -26,10 +26,10 @@ def config(filepath, config=None):
       c = yaml.safe_load(open(filepath))
   elif isinstance(config, dict):
       format = 'yaml'
-      c = config
-  print filepath
+      c = obj
+
   # set environmental variable
-  os.environ['PARDATA_CONFIG_PATH'] = filepath
+  os.environ['PARTICLE_CONFIG_PATH'] = filepath
 
   # write to file:
   with open(filepath, 'wb') as f:
@@ -52,12 +52,9 @@ def run():
     facebook
   ]
   print("\n----------------------------------\n")
-  if DEBUG:
-    for task in tasks:
-      execute(task)
-  else:
-    threaded(tasks, execute, 2, 4)
-
+  # for task in tasks:
+  #   task.run()
+  threaded(tasks, execute, 4, 4)
 
 if __name__ == '__main__':
     import sys

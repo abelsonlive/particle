@@ -3,8 +3,8 @@
 
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
-from par_data.common import db, CONFIG, DEBUG
-from par_data.helpers import *
+from particle.common import db, CONFIG, DEBUG
+from particle.helpers import *
 from datetime import datetime, timedelta
 from thready import threaded
 import json

@@ -8,14 +8,12 @@ import yaml
 # defaults
 DEBUG = False
 APP_DEBUG = True
-INIT = False
 
 # initialize redis
 db = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 try:
   # load config
-  CONFIG = yaml.safe_load(open(os.getenv('PARDATA_CONFIG_PATH')))
+  CONFIG = yaml.safe_load(open(os.getenv('PARTICLE_CONFIG_PATH')))
 except Exception as e:
-  print("WARNING YOU MUST SET $PARDATA_CONFIG_PATH with a valid pardata.yml file")
-  print e
+  print "YOU MUST SET $PARTICLE_CONFIG_PATH with a valid particle.yml filepath"

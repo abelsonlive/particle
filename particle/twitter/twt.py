@@ -1,10 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# import sys
-# sys.path.append('../../')
 
 import tweepy
-from par_data.common import CONFIG, DEBUG
+from particle.common import CONFIG, DEBUG
 
 def connect():
 	"""

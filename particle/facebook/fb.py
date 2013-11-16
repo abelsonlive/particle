@@ -6,7 +6,7 @@ import facepy
 import yaml
 from datetime import datetime, timedelta
 from urlparse import parse_qs
-from par_data.common import DEBUG, CONFIG
+from particle.common import DEBUG, CONFIG
 
 def generate_extended_access_token():
     """
@@ -43,7 +43,7 @@ def generate_extended_access_token():
         CONFIG['facebook'].pop('stable_access_token', token)
         CONFIG['facebook'].pop('stable_access_token_expires_at', int(expires_at.strftime("%s")))
         
-        fp = os.getenv('PARDATA_CONFIG_PATH')
+        fp = os.getenv('PARTICLE_CONFIG_PATH')
         with open(fp, 'wb') as f:
             f.write(yaml.dump(CONFIG, default_flow_style=False))
             print "INFO: THIS IS YOUR STABLE ACCESS TOKEN: %s" % token
