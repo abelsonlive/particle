@@ -44,22 +44,19 @@ def init(filepath, obj=None):
 def execute(task):
   task.run()
 
-def run():
-  tasks = [
-    promopages,
-    rssfeeds,
-    twitter,
-    facebook
-  ]
+def run(tasks=["twitter", "facebook", "rssfeeds", "promopages"]):
+  tasks_to_run = []
+  for t in tasks:
+    if t=="twitter":
+      tasks_to_run.append(twitter)
+    elif t=="facebook":
+      tasks_to_run.append(facebook)
+    elif t=="rssfeeds":
+      tasks_to_run.append(rssfeeds)
+    elif t=="promopages":
+      tasks_to_run.append(promopages)
   print("\n----------------------------------\n")
   # for task in tasks:
   #   task.run()
-  threaded(tasks, execute, 4, 4)
-
-if __name__ == '__main__':
-    import sys
-    try:
-      config(sys.argv[1])
-    except:
-      run()
+  threaded(tasks_to_run, execute, 2, 4)
 

@@ -1,4 +1,4 @@
-from particle.run import run
-from particle.run import init
+from particle.main import run
+from particle.main import init
 from particle.common import db as redis
 from particle.common import CONFIG
