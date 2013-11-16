@@ -6,9 +6,9 @@ import facepy
 import yaml
 from datetime import datetime, timedelta
 from urlparse import parse_qs
-from particle.common import DEBUG, CONFIG
+from particle.common import DEBUG
 
-def generate_extended_access_token():
+def generate_extended_access_token(config):
     """
     Get an extended OAuth access token.
 
@@ -19,20 +19,21 @@ def generate_extended_access_token():
     Returns a tuple with a string describing the extended access token and a datetime instance
     describing when it expires.
     """
-    if not CONFIG['facebook'].has_key('stable_access_token'):
+    if not config['facebook'].has_key('stable_access_token'):
+        #
         # access tokens
         default_access_token = facepy.get_application_access_token(
-            application_id = CONFIG['facebook']['app_id'],  
-            application_secret_key = CONFIG['facebook']['app_secret']
+            application_id = config['facebook']['app_id'],  
+            application_secret_key = config['facebook']['app_secret']
         )
         graph = facepy.GraphAPI(default_access_token)
 
         response = graph.get(
             path='oauth/access_token',
-            client_id = CONFIG['facebook']['app_id'],
-            client_secret = CONFIG['facebook']['app_secret'],
+            client_id = config['facebook']['app_id'],
+            client_secret = config['facebook']['app_secret'],
             grant_type = 'fb_exchange_token',
-            fb_exchange_token = CONFIG['facebook']['temp_access_token']
+            fb_exchange_token = config['facebook']['temp_access_token']
         )
 
         components = parse_qs(response)
@@ -40,18 +41,17 @@ def generate_extended_access_token():
         token = components['access_token'][0]
         expires_at = datetime.now() + timedelta(seconds=int(components['expires'][0]))
 
-        CONFIG['facebook'].pop('stable_access_token', token)
-        CONFIG['facebook'].pop('stable_access_token_expires_at', int(expires_at.strftime("%s")))
-        
-        fp = os.getenv('PARTICLE_CONFIG_PATH')
-        with open(fp, 'wb') as f:
-            f.write(yaml.dump(CONFIG, default_flow_style=False))
-            print "INFO: THIS IS YOUR STABLE ACCESS TOKEN: %s" % token
-            print "INFO: IT EXPIRES AT %s" % expires_at
-            print "INFO: YOUR CONFIG FILE (%s) HAS BEEN UPDATED" % fp
+        config['facebook'].pop('stable_access_token', token)
+        config['facebook'].pop('stable_access_token_expires_at', int(expires_at.strftime("%s")))
+        print "INFO: This is your new stable facebook access token: %s" % token
+        print "INFO: It will expire on %s" % expires_at.strftime("%Y-%m-%d")
+        return config
 
-def connect():
-    return facepy.GraphAPI(CONFIG['facebook']['stable_access_token'])
+    else:
+        return config
+
+def connect(config):
+    return facepy.GraphAPI(config['facebook']['stable_access_token'])
 
 if __name__ == '__main__':
     generate_extended_access_token()

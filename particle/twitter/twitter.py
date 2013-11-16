@@ -6,12 +6,13 @@ import tweepy
 from thready import threaded
 from datetime import datetime
 from particle.twitter import twt
-from particle.common import db, CONFIG, DEBUG
+from particle.common import db, DEBUG
 from particle.helpers import *
 
 TWT_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
-def parse_tweet(t):
+def parse_tweet(tweet_arg_set):
+  t, config = tweet_arg_set
 
   # check if id exists
   twt_id = t.id_str
@@ -21,10 +22,10 @@ def parse_tweet(t):
     db.sadd('twitter_twt_ids', twt_id)
     # check for relevant urls
     raw_urls = [u['expanded_url'] for u in t.entities['urls']]
-    if any([is_article(u) for u in raw_urls]):
+    if any([is_article(u, config) for u in raw_urls]):
 
       # parse urls
-      article_urls = set([parse_url(unshorten_link(u)) for u in raw_urls])
+      article_urls = set([parse_url(unshorten_link(u, config)) for u in raw_urls])
 
       # parse dates
       # sometimes t.created_at is a datetime object
@@ -33,8 +34,8 @@ def parse_tweet(t):
       else:
         dt = datetime.strptrim(t.created_at, TWT_DATE_FORMAT)
       
-      date_time = tz_adj(dt)
-      time_bucket = round_datetime(date_time) if date_time is not None else None
+      date_time = tz_adj(dt, config)
+      time_bucket = round_datetime(date_time, config) if date_time is not None else None
       
       raw_timestamp = int(date_time.strftime('%s'))
       
@@ -66,31 +67,32 @@ def parse_tweet(t):
         }
         
         data_source = "twitter_%s" % value['twt_screen_name'] 
+        
         # upsert url
-        upsert_url(article_url, article_slug, data_source)
+        upsert_url(article_url, article_slug, data_source, config)
 
         value = json.dumps({ data_source : value})
         
         # add data to redis
         db.zadd(article_slug, time_bucket, value)
 
-def parse_tweets(tweets):
+def parse_tweets(tweet_arg_sets):
     if DEBUG:
-      for t in tweets:
-        parse_tweet(t)
+      for tweet_arg_set in tweet_arg_sets:
+        parse_tweet(tweet_arg_set)
     else:
-      threaded(tweets, parse_tweet, 30, 200)
+      threaded(tweet_arg_sets, parse_tweet, 30, 200)
 
-def run():
-    list_owner = CONFIG['twitter']['list_owner']
-    list_slug = CONFIG['twitter']['list_slug']
+def run(config):
+    list_owner = config['twitter']['list_owner']
+    list_slug = config['twitter']['list_slug']
     print "INFO\tTWITTER\tgetting new data for twitter.com/%s/lists/%s" % (list_owner, list_slug)
     try:
-        tweets = [t for t in twt.get_list_timeline()]
+        tweet_arg_sets = [(t, config) for t in twt.get_list_timeline(config)]
     except tweepy.error.TweepError as e:
         print e
     else:
-        return parse_tweets(tweets)
+        return parse_tweets(tweet_arg_sets)
 
 if __name__ == '__main__':
   run()

@@ -3,7 +3,7 @@
 
 from datetime import datetime, timedelta
 import re
-from particle.common import CONFIG, db
+from particle.common import db
 from HTMLParser import HTMLParser
 from urlparse import urlparse
 import pytz
@@ -21,12 +21,12 @@ def print_output(article_url, time_bucket, value):
 
 # DATE HELPERS #
 
-def round_datetime(dt):
+def round_datetime(dt, config):
   """
   round dateime object to set bucket
   return as timestamp integer
   """
-  bucket = int(CONFIG['global']['bucket'])
+  bucket = int(config['global']['bucket'])
   dt = dt - timedelta(
           minutes = dt.minute % bucket,
           seconds = dt.second,
@@ -34,8 +34,8 @@ def round_datetime(dt):
       )
   return int(dt.strftime('%s'))
 
-def tz_adj(dt):
-    tz = CONFIG['global']['newsroom_timezone']
+def tz_adj(dt, config):
+    tz = config['global']['newsroom_timezone']
     utc = pytz.timezone("UTC")
     mytz = pytz.timezone(tz)
     try:
@@ -45,27 +45,27 @@ def tz_adj(dt):
     else:
         return mytz.normalize(dt.astimezone(mytz))
 # database
-def current_datetime():
+def current_datetime(config):
   """
   generate datetime bucket for sorted set ranking
   """
-  tz = CONFIG['global']['newsroom_timezone']
+  tz = config['global']['newsroom_timezone']
   mytz = pytz.timezone(tz)
   return datetime.now(tz=mytz)
 
-def current_timestamp():
+def current_timestamp(config):
   """
   generate datetime bucket for sorted set ranking
   """
-  tz = CONFIG['global']['newsroom_timezone']
+  tz = config['global']['newsroom_timezone']
   mytz = pytz.timezone(tz)
   return int(datetime.now(tz=mytz).strftime('%s'))
 
-def gen_time_bucket():
+def gen_time_bucket(config):
   """
   generate datetime bucket for sorted set ranking
   """
-  return round_datetime(current_datetime())
+  return round_datetime(current_datetime(config), config)
 
 # DATABASE HELPERS
 
@@ -77,13 +77,13 @@ def sluggify(url):
     out = out[:-4].strip()
   return re.sub(r"\s+", "-", out).lower()
 
-def upsert_url(article_url, article_slug, data_source):
+def upsert_url(article_url, article_slug, data_source, config):
   if not db.sismember('article_set', article_url):
     # add it to the set
     db.sadd('article_set', article_url)
 
     # insert metadata
-    ts = current_timestamp()
+    ts = current_timestamp(config)
     value = json.dumps({
       "url" : article_url,
       "slug": article_slug,
@@ -108,9 +108,9 @@ def parse_url(url):
   o = urlparse(url)
   return  "%s://%s%s" % (o.scheme, o.netloc, o.path)
 
-def is_article(link_url):
-  patterns = CONFIG['global']['content_regexes'] + \
-             CONFIG['global']['short_regexes']
+def is_article(link_url, config):
+  patterns = config['global']['content_regexes'] + \
+             config['global']['short_regexes']
 
   if len(patterns)>0:
     return any([re.search(pattern, link_url) for pattern in patterns])
@@ -209,8 +209,8 @@ def is_facebook_link(link):
   else:
       return False
 
-def test_for_short_link(link):
-  patterns = CONFIG['global']['short_regexes']
+def test_for_short_link(link, config):
+  patterns = config['global']['short_regexes']
   if any([re.search(p, link) for p in patterns]):
     return True
   elif is_short_link(link):
@@ -218,12 +218,12 @@ def test_for_short_link(link):
   else:
     return False
 
-def unshorten_link(link):
+def unshorten_link(link, config):
   """
   recursively unshorten a link
   """
   l = link
-  test = test_for_short_link(l)
+  test = test_for_short_link(l, config)
   if test:
     tries = 0
     while test:
@@ -248,7 +248,7 @@ def unshorten_link(link):
         # give it one more shot!
         else:
           l = r.url
-          test = test_for_short_link(l)
+          test = test_for_short_link(l, config)
           tries +=1
           
           # if we've tried 10 times, give up
@@ -261,10 +261,10 @@ def unshorten_link(link):
   else:
     return link
 
-def extract_url(s):
+def extract_url(s, config):
     """
     get urls from input string
     """
     pattern = "(https?://[^\s]+)"
-    return [unshorten_link(l) for l in re.findall(pattern, s) if len(l)>5]
+    return [unshorten_link(l, config) for l in re.findall(pattern, s) if len(l)>5]
 

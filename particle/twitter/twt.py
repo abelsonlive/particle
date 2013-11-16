@@ -2,18 +2,18 @@
 # -*- coding: utf-8 -*-
 
 import tweepy
-from particle.common import CONFIG, DEBUG
+from particle.common import DEBUG
 
-def connect():
+def connect(config):
 	"""
 	Given 4 Environmental Variables, Connect to Twitter
 	"""
 	
 	# load credentials
-	consumer_key = CONFIG['twitter']['consumer_key']
-	consumer_secret = CONFIG['twitter']['consumer_secret']
-	access_token = CONFIG['twitter']['access_token']
-	access_token_secret = CONFIG['twitter']['access_token_secret']
+	consumer_key = config['twitter']['consumer_key']
+	consumer_secret = config['twitter']['consumer_secret']
+	access_token = config['twitter']['access_token']
+	access_token_secret = config['twitter']['access_token_secret']
 
 	# authenticate
 	auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
@@ -22,17 +22,17 @@ def connect():
 
 	return api
 
-def generate_list():
+def generate_list(config):
 	# parse handles
-	if isinstance(CONFIG['twitter']['list_screen_names'], basestring):
-		screen_names = [CONFIG['twitter']['list_screen_names']]
+	if isinstance(config['twitter']['list_screen_names'], basestring):
+		screen_names = [config['twitter']['list_screen_names']]
 	else:
-		screen_names = CONFIG['twitter']['list_screen_names']
+		screen_names = config['twitter']['list_screen_names']
 
-	api = connect()
+	api = connect(config)
 	try:
-		slug = CONFIG['twitter']['list_slug']
-		owner_screen_name = CONFIG['twitter']['list_owner']
+		slug = config['twitter']['list_slug']
+		owner_screen_name = config['twitter']['list_owner']
 		api.create_list(slug)
 
 	except tweepy.error.TweepError as e:
@@ -52,11 +52,11 @@ def generate_list():
 			else:
 				print "INFO\tTWT\tadding %s to list: %s for user: %s" % (screen_name, slug, owner_screen_name)
 
-def get_list_timeline():
-	api = connect()
+def get_list_timeline(config):
+	api = connect(config)
 	list_tweets = api.list_timeline(
-					owner_screen_name = CONFIG['twitter']['list_owner'], 
-					slug =  CONFIG['twitter']['list_slug'],
-					count = CONFIG['twitter']['limit']
+					owner_screen_name = config['twitter']['list_owner'], 
+					slug =  config['twitter']['list_slug'],
+					count = config['twitter']['limit']
 				)
 	return [lt for lt in list_tweets]

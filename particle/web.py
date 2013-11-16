@@ -4,7 +4,7 @@ import json
 from flask import request
 import dateutil.parser
 from particle.helpers import *
-from particle.common import db, CONFIG, APP_DEBUG
+from particle.common import db, APP_DEBUG
 
 app = flask.Flask(__name__)
 
@@ -118,7 +118,10 @@ def recent():
   # turn it into a json list
   return "[%s]" % ",".join(results[0:21])
 
-if __name__ == "__main__":
-  if APP_DEBUG:
-    app.debug = True
-  app.run(host='0.0.0.0', port=5000)
+def api(host='0.0.0.0', port=5000, debug=True):
+  app.debug = debug
+  app.run(host='0.0.0.0', port=5000, debug=True)
+
+if __name__ == '__main__':
+  api()
+  
