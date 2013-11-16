@@ -198,3 +198,15 @@ facebook:
   - nytimes 
   insights_limit: 200
 ```
+
+#### Promopages
+A powerful feature of `particle` is it's ability to pull in links from arbitrary pages and extract metadata about those links, like their position, font size,  associated text, and image attributes. This feature works by harnessing PhantomJS and Selenium to render the pages in a headless browser and crawl the links to match patterns. You can use it to detect links on homepages or really any other site around the web. This function is simply customized in `particle.yml`:
+
+```
+promopages:
+  nyt_homepage: http://www.nytimes.com/
+```
+
+Here the key of the promopage - `nyt_homepage` - indicates how the datastore will refer to an event on this page (more on this below.) and the value is the url you want to track for links.
+
+
