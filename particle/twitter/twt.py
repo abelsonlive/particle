@@ -23,12 +23,16 @@ def connect(config):
 	return api
 
 def generate_list(config):
+
 	# parse handles
 	if isinstance(config['twitter']['list_screen_names'], basestring):
 		screen_names = [config['twitter']['list_screen_names']]
 	else:
 		screen_names = config['twitter']['list_screen_names']
-
+	
+	slug = config['twitter']['list_slug']
+	owner_screen_name = config['twitter']['list_owner']
+	
 	api = connect(config)
 	try:
 		api.create_list(slug)
