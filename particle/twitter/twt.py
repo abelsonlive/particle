@@ -23,6 +23,9 @@ def connect(config):
 	return api
 
 def generate_list(config):
+	slug = config['twitter']['list_slug']
+	owner_screen_name = config['twitter']['list_owner']
+	print "INFO\tTWT\tcreating or updating twitter list %s for user: %s" % (slug, owner_screen_name)
 	# parse handles
 	if isinstance(config['twitter']['list_screen_names'], basestring):
 		screen_names = [config['twitter']['list_screen_names']]
@@ -31,8 +34,6 @@ def generate_list(config):
 
 	api = connect(config)
 	try:
-		slug = config['twitter']['list_slug']
-		owner_screen_name = config['twitter']['list_owner']
 		api.create_list(slug)
 
 	except tweepy.error.TweepError as e:
@@ -40,17 +41,20 @@ def generate_list(config):
 		print e
 		return None
 	else:
+		# get current screen names
+		list_members = frozenset([m.screen_name for m in  api.list_members(owner_screen_name, slug)])
 		for screen_name in screen_names:
-			try:
-				api.add_list_member(
-					owner_screen_name = owner_screen_name,
-					slug = slug,
-					screen_name = screen_name
-				)
-			except:
-				print "%s doesn't exist" % screen_name
-			else:
-				print "INFO\tTWT\tadding %s to list: %s for user: %s" % (screen_name, slug, owner_screen_name)
+			if screen_name not in list_members:
+				try:
+					api.add_list_member(
+						owner_screen_name = owner_screen_name,
+						slug = slug,
+						screen_name = screen_name
+					)
+				except:
+					print "%s doesn't exist" % screen_name
+				else:
+					print "INFO\tTWT\tadding %s to list: %s for user: %s" % (screen_name, slug, owner_screen_name)
 
 def get_list_timeline(config):
 	api = connect(config)
