@@ -1,4 +1,4 @@
-import particle.run as PP
+from particle import Particle
 
-PP.config('propublica.yml')
-PP.run()
+pp = Particle('propublica.yml')
+pp.run()
