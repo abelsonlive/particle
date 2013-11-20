@@ -1,10 +1,10 @@
 import flask
 import redis
 import json
-from flask import request
+from flask import Response, request
 import dateutil.parser
 from particle.helpers import *
-from particle.common import db, APP_DEBUG
+from particle.common import db
 
 app = flask.Flask(__name__)
 
@@ -101,7 +101,7 @@ def query():
   else: 
     return results
 
-@app.route("/recent_articles/")
+@app.route("/recent-articles/")
 def recent():
   # parse args
   start = request.args.get('start', 0)
@@ -120,7 +120,7 @@ def recent():
 
 def api(host='0.0.0.0', port=5000, debug=True):
   app.debug = debug
-  app.run(host='0.0.0.0', port=5000, debug=True)
+  app.run(host=host, port=port)
 
 if __name__ == '__main__':
   api()

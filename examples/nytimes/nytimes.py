@@ -1,4 +1,4 @@
-import particle.run as NYT
+from particle import Particle
 
-NYT.config('nytimes.yml')
-NYT.run()
+nyt = Particle('nytimes.yml')
+nyt.run()

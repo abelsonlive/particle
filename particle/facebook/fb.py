@@ -8,6 +8,10 @@ from datetime import datetime, timedelta
 from urlparse import parse_qs
 from particle.common import DEBUG
 
+
+def connect(config):
+    return facepy.GraphAPI(config['facebook']['stable_access_token'])
+
 def generate_extended_access_token(config):
     """
     Get an extended OAuth access token.
@@ -19,8 +23,12 @@ def generate_extended_access_token(config):
     Returns a tuple with a string describing the extended access token and a datetime instance
     describing when it expires.
     """
-    if not config['facebook'].has_key('stable_access_token'):
-        #
+    tests = [
+        not config['facebook'].has_key('stable_access_token'),
+        config['facebook']['stable_access_token'] is None
+
+    ]
+    if any(tests):
         # access tokens
         default_access_token = facepy.get_application_access_token(
             application_id = config['facebook']['app_id'],  
@@ -49,10 +57,3 @@ def generate_extended_access_token(config):
 
     else:
         return config
-
-def connect(config):
-    return facepy.GraphAPI(config['facebook']['stable_access_token'])
-
-if __name__ == '__main__':
-    generate_extended_access_token()
-    

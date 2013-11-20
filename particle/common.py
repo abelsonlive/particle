@@ -4,7 +4,7 @@
 import redis
 import yaml
 
-# defaults
+# GLOBAL settings
 DEBUG = False
 APP_DEBUG = True
 

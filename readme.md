@@ -9,15 +9,15 @@ particle
 
 When you start a new `particle` project, you'll want to tell `particle` where this file is:
 ```
-import particle.run as particle
+from particle import Particle
 
-particle.init('~/particle.yml')
+p = Particle('~/particle.yml')
 ```
 This one function will read in your configuration file, set it as an environmental variable (`PARTICLE_CONFIG_PATH`), build a Twitter list of the the handles you want to follow, and insert a stable facebook API key (more on all this below).
 
 Now you're all set to run `particle`:
 ```
-particle.run()
+p.run()
 ```
 
 ## `particle.yml`
