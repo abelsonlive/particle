@@ -3,23 +3,25 @@ particle
 `particle` is a tool for collecting data about links on Twitter, Facebook, Webpages, and RSS feeds (for now). It joins this data together by a common url and bucketed timestamp.  This enables analysis similar to that which I discuss in this [blog post](http://brianabelson.com/open-news/2013/11/14/Pageviews-above-replacement.html). `particle` is like [`pollster`](https://github.com/stdbrouw/pollster) but not as developed and nowhere near as sophisticated. I just didn't want to bother learning coffeescript so I built my own version :).
 
 ## Configuration
+----------------
 
-`particle` runs off of a yaml config file which contains information about the data sources you want to collect, referred to here as `particle.yml`. This file could also be json, or simply a python dictionary. If you want to see an example of such a file, check out [this one](http://github.com/abelsonlive/particle/examples/nytimes/nytimes.yml), though we'll discuss it in more detail below.
+`particle` runs off of a yaml config file which contains information about the data sources you want to collect, referred to here as `particle.yml`. If you want to see an example of such a file, check out [this one](http://github.com/abelsonlive/particle/examples/nytimes/nytimes.yml), though we'll discuss it in more detail below.
 
 When you start a new `particle` project, you'll want to tell `particle` where this file is:
 ```
 from particle import Particle
 
-p = Particle('~/particle.yml')
+p = Particle('particle.yml')
 ```
-This one function will read in your configuration file, build a Twitter list of the the handles you want to follow, and insert a stable facebook API key (more on all this below).
+This one function will read in your configuration file, set it as an environmental variable (`PARTICLE_CONFIG_PATH`), build a Twitter list of the the handles you want to follow, and insert a stable facebook API key (more on all this below).
 
 Now you're all set to run `particle`:
 ```
-p.run()
+p.run(tasks=['twitter', 'facebook'])
 ```
 
 ## `particle.yml`
+-----------------
 
 ### Global settings
 
@@ -208,4 +210,17 @@ promopages:
 Here the key of the promopage - `nyt_homepage` - indicates how the datastore will refer to an event on this page (more on this below.) and the value is the url you want to track for links.
 
 #### RSS Feeds
-`particle` can also function as a feed aggregator by pulling in content from a variety of RSS feeds, enabling comparisons between metrics on sharing and 
+Finally, `particle` also allows you to pull in content from abrtrary rss feeds. similar to `promopages`, you set these in `particle.yml` by listing key value pairs that correspond to the name and the url of the feed. In this case, however, the value is a list of two parameters: `feed_url` - the url of the feed - and `feed_text` which indicates whether or not the feed is publishing the entirety of an articles content. If `feed_text` is set to "false" it, `particle` will attempt to scrape these pages for the article text. Here's all that in `particle.yml`:
+
+```
+  nyt_timeswire:
+    feed_url: http://www.nytimes.com/timeswire/feeds/
+    full_text: false
+```
+
+### Database 
+The data is stored in `redis` as a sorted set in which the keys are resolved article urls, the rank is the bucketed timestamp, and the value is a json file of an event associated with that timestamp, with the key as the data source and the value as the data associated with that event. This means, by querying redis you can quickly get all the events for a url at a particular time, within a timerange, or across the entire span of the data without doing any joins.
+
+### API
+`particle` has a built-in
+
