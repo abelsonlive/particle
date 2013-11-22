@@ -102,7 +102,7 @@ def scrape_links(links_arg_set):
 
 def scrape_promo_page(page_arg_set):
     promo_url, data_source, config = page_arg_set
-    b = webdriver.PhantomJS('/usr/local/bin/phantomjs')
+    b = webdriver.PhantomJS(config['global']['phantomjs'])
     b.get(promo_url)
     links_arg_set = (b, promo_url, data_source, config)
     scrape_links(links_arg_set)
