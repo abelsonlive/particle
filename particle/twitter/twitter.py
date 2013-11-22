@@ -12,7 +12,7 @@ from particle.helpers import *
 TWT_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 def parse_tweet(tweet_arg_set):
-  t, config = tweet_arg_set
+  slug, t, config = tweet_arg_set
 
   # check if id exists
   twt_id = t.id_str
@@ -52,6 +52,7 @@ def parse_tweet(tweet_arg_set):
           'article_url': article_url,
           'time_bucket': time_bucket,
           'raw_timestamp' :  raw_timestamp,
+          'twt_list' : slug,
           'twt_post_created': raw_timestamp,
           'twt_id': twt_id,
           'twt_screen_name': t.user.screen_name,
@@ -66,7 +67,7 @@ def parse_tweet(tweet_arg_set):
           'twt_in_reply_to_status_id_str': t.in_reply_to_status_id_str
         }
         
-        data_source = "twitter_%s" % value['twt_screen_name'] 
+        data_source = "twitter_%s" % slug
         
         # upsert url
         upsert_url(article_url, article_slug, data_source, config)
@@ -84,11 +85,13 @@ def parse_tweets(tweet_arg_sets):
       threaded(tweet_arg_sets, parse_tweet, 30, 200)
 
 def run(config):
-    list_owner = config['twitter']['list_owner']
-    list_slug = config['twitter']['list_slug']
-    print "INFO\tTWITTER\tgetting new data for twitter.com/%s/lists/%s" % (list_owner, list_slug)
     try:
-        tweet_arg_sets = [(t, config) for t in twt.get_list_timeline(config)]
+        tweet_arg_sets = [
+          (slug, t, config) 
+          for l in twt.get_list_timelines(config) 
+          for slug, tweets in l.iteritems()
+          for t in tweets
+        ]
     except tweepy.error.TweepError as e:
         print e
     else:

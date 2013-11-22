@@ -12,6 +12,7 @@ from particle.rssfeeds import rssfeeds
 from particle.facebook import fb
 from particle.twitter import twt
 from particle.common import DEBUG, db
+from particle.helpers import current_datetime
 
 class Particle:
   def __init__(self, 
@@ -31,7 +32,7 @@ class Particle:
     self.CONFIG = fb.generate_extended_access_token(self.CONFIG)
 
     # generate twitter list
-    twt.generate_list(self.CONFIG)
+    # twt.generate_lists(self.CONFIG)
 
   def _execute(self, task):
     if task=="twitter":
@@ -51,11 +52,12 @@ class Particle:
     # check if tasks is not a list
     if isinstance(tasks, basestring):
       tasks = [tasks]
-
-    print("\n----------------------------------\n")
+    print "New Job @ %s" % current_datetime(self.CONFIG).strftime('%Y-%m-%d %H:%M:%S')
+    print "\n---------------------------------------\n"
     # run them
-    threaded(tasks, self._execute, num_threads= num_threads,  max_queue = max_queue)
-
+    for t in tasks:
+      self._execute(t)
+    # threaded(tasks, self._execute, num_threads= num_threads,  max_queue = max_queue)
 
 def cl():
   parser = OptionParser()

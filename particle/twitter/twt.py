@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import tweepy
+from thready import threaded
 from particle.common import DEBUG
 
 def connect(config):
@@ -22,46 +23,70 @@ def connect(config):
 
 	return api
 
-def generate_list(config):
+def add_list_member(list_member_arg_set):
 
-	# parse handles
-	if isinstance(config['twitter']['list_screen_names'], basestring):
-		screen_names = [config['twitter']['list_screen_names']]
+	screen_name, slug, owner_screen_name, api = list_member_arg_set
+
+	try:
+		api.add_list_member(
+			owner_screen_name = owner_screen_name,
+			slug = slug,
+			user_id = screen_name
+		)
+
+	except:
+		print "%s doesn't exist" % screen_name
+
 	else:
-		screen_names = config['twitter']['list_screen_names']
+		print "INFO\tTWT\tadding %s to list: %s for user: %s" % (screen_name, slug, owner_screen_name)	
+
+def generate_list(api, slug, list_dict):
 	
-	slug = config['twitter']['list_slug']
-	owner_screen_name = config['twitter']['list_owner']
+	# parse handles
+	if isinstance(list_dict['screen_names'], basestring):
+		screen_names = [
+			sn.strip() 
+			for sn in open(list_dict['screen_names']).read().split("\n") 
+			if sn != '' and sn is not None 
+		]
+
+	else:
+		screen_names = list_dict['screen_names']
 	
-	api = connect(config)
+	owner_screen_name = list_dict['owner']
+	
 	try:
 		api.create_list(slug)
 
 	except tweepy.error.TweepError as e:
+		
 		print "ERROR\tTWT\t%s Already Exists for user %s" % (slug, owner_screen_name)
 		print e
 		return None
-	else:
-		# get current screen names
-		list_members = frozenset([m.screen_name for m in  api.list_members(owner_screen_name, slug)])
-		for screen_name in screen_names:
-			if screen_name not in list_members:
-				try:
-					api.add_list_member(
-						owner_screen_name = owner_screen_name,
-						slug = slug,
-						screen_name = screen_name
-					)
-				except:
-					print "%s doesn't exist" % screen_name
-				else:
-					print "INFO\tTWT\tadding %s to list: %s for user: %s" % (screen_name, slug, owner_screen_name)
 
-def get_list_timeline(config):
+	else:
+		
+		list_member_arg_sets = [
+			(screen_name, slug, owner_screen_name, api) 
+			for screen_name in screen_names
+		]
+		threaded(list_member_arg_sets, add_list_member, 30, 200)
+
+def generate_lists(config):
 	api = connect(config)
-	list_tweets = api.list_timeline(
-					owner_screen_name = config['twitter']['list_owner'], 
-					slug =  config['twitter']['list_slug'],
-					count = config['twitter']['limit']
-				)
-	return [lt for lt in list_tweets]
+	for slug, list_dict in config['twitter']['lists'].iteritems():
+		generate_list(api, slug, list_dict)
+
+def get_list_timelines(config):
+	api = connect(config)
+	list_list = []
+	for slug, list_dict in config['twitter']['lists'].iteritems():
+		print "INFO\tTWITTER\tgetting new data for twitter.com/%s/lists/%s" % (list_dict['owner'], slug)
+		tweets = api.list_timeline(
+						owner_screen_name = list_dict['owner'], 
+						slug =  slug,
+						count = list_dict['limit']
+					)
+		list_list.append({slug: [t for t in tweets]})
+
+	return list_list

@@ -28,8 +28,8 @@ def extract_article(url):
     html = Rdb.summary()
     # return article data
     return {
-      'extracted_title': strip_tags(BP.getText()),
-      'extracted_content': Rdb.short_title().strip(),
+      'extracted_title': Rdb.short_title().strip(),
+      'extracted_content': strip_tags(BP.getText()),
     }
 
   # otherwise return an empty dict

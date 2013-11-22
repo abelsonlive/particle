@@ -3,9 +3,8 @@ particle
 `particle` is a tool for collecting data about links on Twitter, Facebook, Webpages, and RSS feeds (for now). It joins this data together by a common url and bucketed timestamp.  This enables analysis similar to that which I discuss in this [blog post](http://brianabelson.com/open-news/2013/11/14/Pageviews-above-replacement.html). `particle` is like [`pollster`](https://github.com/stdbrouw/pollster) but not as developed and nowhere near as sophisticated. I just didn't want to bother learning coffeescript so I built my own version :).
 
 ## Configuration
-----------------
 
-`particle` runs off of a yaml config file which contains information about the data sources you want to collect, referred to here as `particle.yml`. If you want to see an example of such a file, check out [this one](http://github.com/abelsonlive/particle/examples/nytimes/nytimes.yml), though we'll discuss it in more detail below.
+`particle` runs off of a yaml config file which contains information about the data sources you want to collect, referred to here as `particle.yml`. This file could also be json, or simply a python dictionary. If you want to see an example of such a file, check out [this one](http://github.com/abelsonlive/particle/examples/nytimes/nytimes.yml), though we'll discuss it in more detail below.
 
 When you start a new `particle` project, you'll want to tell `particle` where this file is:
 ```
@@ -13,7 +12,7 @@ from particle import Particle
 
 p = Particle('~/particle.yml')
 ```
-This one function will read in your configuration file, set it as an environmental variable (`PARTICLE_CONFIG_PATH`), build a Twitter list of the the handles you want to follow, and insert a stable facebook API key (more on all this below).
+This one function will read in your configuration file, build a Twitter list of the the handles you want to follow, and insert a stable facebook API key (more on all this below).
 
 Now you're all set to run `particle`:
 ```
@@ -21,7 +20,6 @@ p.run()
 ```
 
 ## `particle.yml`
------------------
 
 ### Global settings
 
@@ -209,4 +207,5 @@ promopages:
 
 Here the key of the promopage - `nyt_homepage` - indicates how the datastore will refer to an event on this page (more on this below.) and the value is the url you want to track for links.
 
-
+#### RSS Feeds
+`particle` can also function as a feed aggregator by pulling in content from a variety of RSS feeds, enabling comparisons between metrics on sharing and 

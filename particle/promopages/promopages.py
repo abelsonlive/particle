@@ -72,9 +72,9 @@ def scrape_link(link_arg_set):
                 'pp_promo_url' : promo_url,
                 'pp_link_url': link_url,
                 'pp_headline' : link_text,
-                'pp_font_size' : link.value_of_css_property('font-size'),
-                'pp_pos_x' : link.location['x'],
-                'pp_pos_y' : link.location['y']
+                'pp_font_size' : int(link.value_of_css_property('font-size')[:-2]),
+                'pp_pos_x' : int(link.location['x']),
+                'pp_pos_y' : int(link.location['y'])
             }
 
             value = json.dumps({data_source : dict(img_dict.items() + link_dict.items())})
@@ -102,7 +102,7 @@ def scrape_links(links_arg_set):
 
 def scrape_promo_page(page_arg_set):
     promo_url, data_source, config = page_arg_set
-    b = webdriver.PhantomJS()
+    b = webdriver.PhantomJS('/usr/local/bin/phantomjs')
     b.get(promo_url)
     links_arg_set = (b, promo_url, data_source, config)
     scrape_links(links_arg_set)

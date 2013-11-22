@@ -7,10 +7,14 @@
 */*/*.pyc
 build/
 dist/
-*.egg-info
-particle.yml
 *.log
 */*.log
 */*/*.log
 *.rdb
+*.egg-info
+
+# secret stuff
+particle.yml
 dev/
+nytimes_twitter.txt
+logs/
