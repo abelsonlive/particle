@@ -4,6 +4,8 @@
 import tweepy
 from thready import threaded
 from particle.common import DEBUG
+import logging
+
 
 def connect(config):
 	"""
@@ -35,10 +37,10 @@ def add_list_member(list_member_arg_set):
 		)
 
 	except:
-		print "%s doesn't exist" % screen_name
+		logging.info( "%s doesn't exist" % screen_name )
 
 	else:
-		print "INFO\tTWT\tadding %s to list: %s for user: %s" % (screen_name, slug, owner_screen_name)	
+		logging.info( "TWT\tadding %s to list: %s for user: %s" % (screen_name, slug, owner_screen_name) )
 
 def generate_list(api, slug, list_dict):
 	
@@ -60,8 +62,8 @@ def generate_list(api, slug, list_dict):
 
 	except tweepy.error.TweepError as e:
 		
-		print "ERROR\tTWT\t%s Already Exists for user %s" % (slug, owner_screen_name)
-		print e
+		logging.error( "ERROR\tTWT\t%s Already Exists for user %s" % (slug, owner_screen_name) )
+		logging.error( e )
 		return None
 
 	else:
@@ -81,7 +83,7 @@ def get_list_timelines(config):
 	api = connect(config)
 	list_list = []
 	for slug, list_dict in config['twitter']['lists'].iteritems():
-		print "INFO\tTWITTER\tgetting new data for twitter.com/%s/lists/%s" % (list_dict['owner'], slug)
+		logging.info( "INFO\tTWITTER\tgetting new data for twitter.com/%s/lists/%s" % (list_dict['owner'], slug) )
 		tweets = api.list_timeline(
 						owner_screen_name = list_dict['owner'], 
 						slug =  slug,

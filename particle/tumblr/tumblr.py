@@ -1,4 +1,5 @@
 import pytumblr
+import logging
 
 def connect(config):
   return pytumblr.TumblrRestClient(

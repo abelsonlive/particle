@@ -1,9 +1,9 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 from thready import threaded
 import json, yaml, os
 from optparse import OptionParser
+import logging
 
 from particle.facebook import facebook
 from particle.twitter import twitter
@@ -14,10 +14,11 @@ from particle.twitter import twt
 from particle.common import DEBUG, db
 from particle.helpers import current_datetime
 
+urllib3_logger = logging.getLogger('urllib3')
+urllib3_logger.setLevel(logging.CRITICAL)
+
 class Particle:
-  def __init__(self, 
-               filepath, 
-               config=None):
+  def __init__(self, filepath, config=None):
 
     # initialize CONFIG
     if config is None:
@@ -52,8 +53,10 @@ class Particle:
     # check if tasks is not a list
     if isinstance(tasks, basestring):
       tasks = [tasks]
-    print "New Job @ %s" % current_datetime(self.CONFIG).strftime('%Y-%m-%d %H:%M:%S')
-    print "\n---------------------------------------\n"
+
+    logging.info( "New Job @ %s" % current_datetime(self.CONFIG).strftime('%Y-%m-%d %H:%M:%S') )
+    logging.info("\n---------------------------------------\n")
+
     # run them
     for t in tasks:
       self._execute(t)

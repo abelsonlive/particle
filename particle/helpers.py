@@ -11,13 +11,16 @@ import requests
 from pprint import pprint
 import string
 import json
+import logging
 
+requests_logger = logging.getLogger('requests')
+requests_logger.setLevel(logging.CRITICAL)
 
 # debug msg
 def print_output(article_url, time_bucket, value):
-  print "key: %s" % article_url
-  print "rank: %s" % time_bucket
-  pprint(value)
+  logging.info( "key: %s" % article_url )
+  logging.info( "rank: %s" % time_bucket )
+  logging.info( value )
 
 # DATE HELPERS #
 
@@ -232,7 +235,7 @@ def unshorten_link(link, config):
         r = requests.get(l)
       
       except Exception as e:
-        print "WARNING: unshorten_link", e
+        logging.warning("unshorten_link, %s" % e)
         
         # quit
         return l

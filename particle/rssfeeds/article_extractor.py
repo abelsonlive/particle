@@ -6,6 +6,8 @@ from readability.readability import Document
 import requests
 
 from particle.helpers import *
+import logging
+
 
 def extract_article(url):
   r = requests.get(url)

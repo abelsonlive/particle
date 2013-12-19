@@ -8,3 +8,4 @@ def lookup_global_hash(api, url):
   res = api.shorten(url)
   return res['global_hash']
 
+    

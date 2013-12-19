@@ -8,6 +8,7 @@ from datetime import datetime
 from particle.twitter import twt
 from particle.common import db, DEBUG
 from particle.helpers import *
+import logging
 
 TWT_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
@@ -44,7 +45,7 @@ def parse_tweet(tweet_arg_set):
         # sluggify url
         article_slug = sluggify(article_url)
         screen_name = t.user.screen_name
-        print "INFO\tTWITTER\tNew Tweet %s/%s re: %s" % (screen_name, twt_id, article_slug)
+        logging.info( "TWITTER\tNew Tweet %s/%s re: %s" % (screen_name, twt_id, article_slug) )
 
       # format data
         value = {

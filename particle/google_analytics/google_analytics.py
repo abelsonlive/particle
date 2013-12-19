@@ -6,6 +6,7 @@ import gdata.sample_util
 import yaml
 from datetime import datetime
 from particle.helpers import *
+import logging
 
 GOOGlE_DATE_FORMAT = "%Y%m%d%H"
 

@@ -11,6 +11,7 @@ from particle.facebook import fb
 from particle.helpers import *
 from pprint import pprint
 from datetime import datetime
+import logging
 
 FB_DATE_FORMAT = "%Y-%m-%dT%H:%M:%S+0000"
 
@@ -88,8 +89,10 @@ def insert_new_post(post_arg_set):
 
   try:
     post_id = post_data['id'] if post_data.has_key('id') else None
+
   except Exception as e:
-    print e
+    logging.error( e )
+
   else:
     if is_insights(page_id, config):
       insights_value = get_insights_data(api, page_id, post_id)
@@ -130,7 +133,7 @@ def insert_new_post(post_arg_set):
           'article_slug': article_slug,
           'article_url': article_url,
           'time_bucket': time_bucket,
-          'fb_post_created': time_bucket,
+          'fb_post_created': raw_timestamp,
           'raw_timestamp': raw_timestamp,
           'fb_raw_link' : get_fb_link(post_data, config=config),
           'fb_page_id': page_id,
@@ -144,9 +147,11 @@ def insert_new_post(post_arg_set):
           
         # always insert insights data
         if is_insights(page_id, config):
-          print "INFO\tINSIGHTS\tAdding data from %s re: %s" % (page_id, article_slug)
+          
+          logging.info( "INSIGHTS\tAdding data from %s re: %s" % (page_id, article_slug) )
           # 
           data_source = "facebook_insights_%s" % page_id 
+          
           # upsert url
           upsert_url(article_url, article_slug, data_source, config)
 
@@ -155,7 +160,7 @@ def insert_new_post(post_arg_set):
 
           # format time bucket
           current_time_bucket = gen_time_bucket(config)
-          insights_value.pop('time_bucket', current_time_bucket)
+          insights_value['time_bucket'] =  current_time_bucket
           post_value.pop('time_bucket', None)
           
           value = json.dumps({
@@ -168,7 +173,7 @@ def insert_new_post(post_arg_set):
         # only insert new posts
         elif not db.sismember('facebook_post_ids', post_id):
           
-          print "INFO\tFACEBOOK\tnew post %s re: %s" % (post_id, article_slug)
+          logging.info( "FACEBOOK\tnew post %s re: %s" % (post_id, article_slug) )
           
           # insert id
           db.sadd('facebook_post_ids', post_id)     
@@ -190,13 +195,13 @@ def get_new_data_for_page(page_arg_set):
   """
   api, page_id, config = page_arg_set
 
-  print "INFO\tFACEBOOK\tgetting new data for facebook.com/%s" % page_id
+  logging.info( "FACEBOOK\tgetting new data for facebook.com/%s" % page_id )
   
   # fetch account data so we can associate the number of likes with the account AT THAT TIME
   try:
     acct_data = api.get(page_id)
   except Exception as e:
-    print e
+    logging.error( e )
     return None
   else:
     # determine limit
@@ -225,6 +230,7 @@ def run(config):
     for page_id in page_ids:
       page_arg_set = (api, page_id, config)
       get_new_data_for_page(page_arg_set)
+
   # fetch account data so we can associate the number of likes with the account AT THAT TIME
   else:
     page_arg_sets = [(api, page_id, config) for page_id in page_ids]

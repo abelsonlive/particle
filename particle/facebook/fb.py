@@ -7,7 +7,7 @@ import yaml
 from datetime import datetime, timedelta
 from urlparse import parse_qs
 from particle.common import DEBUG
-
+import logging
 
 def connect(config):
     return facepy.GraphAPI(config['facebook']['stable_access_token'])

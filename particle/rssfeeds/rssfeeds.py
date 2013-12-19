@@ -7,6 +7,7 @@ from datetime import datetime
 from dateutil import parser
 import json
 import requests
+import logging
 
 # custom modules:
 from particle.common import db, DEBUG
@@ -103,7 +104,8 @@ def parse_one_entry(entry_arg_set):
       )
       
       value = json.dumps({data_source: complete_datum})
-      print "INFO\tRSSFEEDS\tNEW POST on %s re: %s" % (data_source, article_url)
+      logging.info( "RSSFEEDS\tNEW POST on %s re: %s" % (data_source, article_url) )
+      
       # upsert the data
       upsert_rss_pub(article_url, article_slug, value)
   

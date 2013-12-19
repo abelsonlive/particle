@@ -62,7 +62,7 @@ def scrape_link(link_arg_set):
             article_slug = sluggify(article_url)
 
             # scrape
-            print "INFO\tPROMOPAGE\tlink detected on %s re: %s" % (promo_url, article_slug)
+            logging.info( "PROMOPAGE\tlink detected on %s re: %s" % (promo_url, article_slug) )
 
             link_dict = {
                 'article_slug' : article_slug,
@@ -87,16 +87,22 @@ def scrape_link(link_arg_set):
 
 
 def scrape_links(links_arg_set):
+    
     b, promo_url, data_source, config = links_arg_set
-    print "INFO\tPROMOPAGE\t%s" % promo_url
+    
+    logging.info( "PROMOPAGE\t%s" % promo_url )
+    
     time_bucket = gen_time_bucket(config)
+    
     links = b.find_elements_by_tag_name("a")
+    
     link_arg_sets = [(promo_url, l, time_bucket, data_source, config) for l in links]
+    
     for link_arg_set in link_arg_sets:
         try:
             scrape_link(link_arg_set)
         except StaleElementReferenceException as e:
-            print "WARNING\t", e
+            logging.warning( e )
             continue
 
 

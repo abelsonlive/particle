@@ -1,10 +1,16 @@
 import flask
 import redis
 import json
+import re
 from flask import Response, request
 import dateutil.parser
 from particle.helpers import *
 from particle.common import db
+
+import logging
+
+urllib3_logger = logging.getLogger('urllib3')
+urllib3_logger.setLevel(logging.CRITICAL)
 
 app = flask.Flask(__name__)
 
@@ -43,8 +49,9 @@ def query():
   data_sources = request.args.get('data_sources', 'all').split(",")
   start = request.args.get('start', 0)
   end = request.args.get('end', 1e11)
+  timestamp = request.args.get('timestamp', None)
   order = request.args.get('order', 'desc')
-  include_article = request.args.get('order', 'true').lower()
+  include_article = request.args.get('include_article', 'true').lower()
   include_keys = request.args.get('include_keys', 'true').lower()
   
   # pesky boolian problem
@@ -58,25 +65,33 @@ def query():
     include_article = True
   elif include_article =='false':
     include_article = False
-  else:
-    include_article = False
+
+  # timestamp override
+  if timestamp is not None:
+    start = timestamp
+    end = timestamp
 
   # fetch data
   results = db.zrangebyscore(article_slug, min = start, max = end)
 
   # optionally filter out particular datasources
   if data_sources[0] != "all":
-    print data_sources
     filtered_results = []
     data = [json.loads(r) for r in results]
-    print data
     for src in data_sources:
       for d in data:
         if d.has_key(src):
           if not include_keys:
-            filtered_results.append(json.dumps(d[src]))
+            filtered_results.append(json.dumps(d.values()))
           else:
             filtered_results.append(json.dumps(d))
+        else:
+          for key in d.keys():
+            if re.search(src, key):
+              if not include_keys:
+                filtered_results.append(json.dumps(d.values()))
+              else:
+                filtered_results.append(json.dumps(d))              
 
       results = filtered_results
 
