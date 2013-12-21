@@ -1,8 +1,7 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from thready import threaded
-import json, yaml, os
-from optparse import OptionParser
 import logging
 
 from particle.facebook import facebook
@@ -58,16 +57,4 @@ class Particle:
     # for t in tasks:
     #   self._execute(t)
     threaded(tasks, self._execute, num_threads= num_threads,  max_queue = max_queue)
-
-def cl():
-  parser = OptionParser()
-  parser.add_option("-c", '--config', dest="config", default="particle.yml")
-  parser.add_option("-t", '--tasks', dest="tasks", default="twitter,facebook,rssfeeds,promopages")
-  (options, args) = parser.parse_args()
-  tasks = options.tasks.split(',')
-  particle = Particle(filepath=options.config)
-  particle.run(tasks = tasks)
-
-if __name__ == '__main__':
-  cl()
     

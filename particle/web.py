@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import flask
 import redis
 import json
@@ -136,7 +139,3 @@ def recent():
 def api(host='0.0.0.0', port=5000, debug=True):
   app.debug = debug
   app.run(host=host, port=port)
-
-if __name__ == '__main__':
-  api()
-  
