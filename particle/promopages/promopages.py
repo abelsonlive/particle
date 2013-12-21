@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from selenium import webdriver
@@ -7,8 +7,9 @@ from particle.common import db, DEBUG
 from particle.helpers import *
 from datetime import datetime, timedelta
 from thready import threaded
-import json
+import json, yaml
 
+# @profile
 def get_image_for_a_link(link):
     try:
         img = link.find_element_by_tag_name("img")
@@ -27,65 +28,68 @@ def get_image_for_a_link(link):
     else:
         return dict(pp_is_img=0)
 
+# @profile
 def scrape_link(link_arg_set):
-    promo_url, link, time_bucket, data_source, config = link_arg_set
-
     try:
-        link_url = link.get_attribute("href")
-    except StaleElementReferenceException:
-        pass
-    else:
-        # parse link text
+        promo_url, link, time_bucket, data_source, config = link_arg_set
+
         try:
-            link_text = link.text.encode('utf-8').strip()
-        except:
-            link_text = None
-        
-        # det image
-        img_dict = get_image_for_a_link(link)
+            link_url = link.get_attribute("href")
+        except StaleElementReferenceException:
+            pass
+        else:            
+            
+            # continue under specified conditions
+            if link_url is not None and isinstance(link_url, basestring) and is_article(link_url, config):
+                
+                # parse link text
+                try:
+                    link_text = link.text.encode('utf-8').strip()
+                except:
+                    link_text = None
 
-        # tests 
-        test_link = link_url is not None and isinstance(link_url, basestring) and is_article(link_url, config)
-        test_text = link_text is not None  and link_text is not ''
-        test_image = True if img_dict['pp_is_img']==1 else False
-        test_existence = True if link.location['x'] > 0 or link.location['y'] > 0 else False
-        tests = [any([test_image, test_text]), test_link, test_existence]
-        
-        # continue under specified conditions
-        if all(tests):
+                if link_text is not None  and link_text is not '':
 
-            # parse link
-            link_url = link_url.encode('utf-8')
-            article_url = parse_url(link_url)
+                    if link.location['x'] > 0 and link.location['y'] > 0:
+                        
+                        # get image
+                        img_dict = get_image_for_a_link(link)
 
-            # sluggify
-            article_slug = sluggify(article_url)
+                        # parse link
+                        link_url = link_url.encode('utf-8')
+                        article_url = parse_url(link_url)
 
-            # scrape
-            logging.info( "PROMOPAGE\tlink detected on %s re: %s" % (promo_url, article_slug) )
+                        # sluggify
+                        article_slug = sluggify(article_url)
 
-            link_dict = {
-                'article_slug' : article_slug,
-                'article_url': article_url,
-                'time_bucket': time_bucket,
-                'raw_timestamp': int(datetime.now().strftime("%s")),
-                'pp_promo_url' : promo_url,
-                'pp_link_url': link_url,
-                'pp_headline' : link_text,
-                'pp_font_size' : int(link.value_of_css_property('font-size')[:-2]),
-                'pp_pos_x' : int(link.location['x']),
-                'pp_pos_y' : int(link.location['y'])
-            }
+                        # scrape
+                        logging.info( "PROMOPAGE\tlink detected on %s re: %s" % (promo_url, article_slug) )
 
-            value = json.dumps({data_source : dict(img_dict.items() + link_dict.items())})
+                        link_dict = {
+                            'article_slug' : article_slug,
+                            'article_url': article_url,
+                            'time_bucket': time_bucket,
+                            'raw_timestamp': int(datetime.now().strftime("%s")),
+                            'pp_promo_url' : promo_url,
+                            'pp_link_url': link_url,
+                            'pp_headline' : link_text,
+                            'pp_font_size' : int(link.value_of_css_property('font-size')[:-2]),
+                            'pp_pos_x' : int(link.location['x']),
+                            'pp_pos_y' : int(link.location['y'])
+                        }
 
-            # upsert url
-            upsert_url(article_url, article_slug, data_source, config)
+                        value = json.dumps({data_source : dict(img_dict.items() + link_dict.items())})
 
-            # upload data to redis
-            db.zadd(article_slug, time_bucket, value)
+                        # upsert url
+                        upsert_url(article_url, article_slug, data_source, config)
 
+                        # upload data to redis
+                        db.zadd(article_slug, time_bucket, value)
 
+    except StaleElementReferenceException as e:
+        logging.warning( e )
+
+# @profile
 def scrape_links(links_arg_set):
     
     b, promo_url, data_source, config = links_arg_set
@@ -99,12 +103,7 @@ def scrape_links(links_arg_set):
     link_arg_sets = [(promo_url, l, time_bucket, data_source, config) for l in links]
     
     for link_arg_set in link_arg_sets:
-        try:
-            scrape_link(link_arg_set)
-        except StaleElementReferenceException as e:
-            logging.warning( e )
-            continue
-
+        scrape_link(link_arg_set)
 
 def scrape_promo_page(page_arg_set):
     promo_url, data_source, config = page_arg_set
@@ -122,4 +121,8 @@ def run(config):
   else:
     page_arg_sets = [(url, slug, config) for slug, url in pages.iteritems()]
     threaded(page_arg_sets, scrape_promo_page, 2, 10)
-      
+
+if __name__ == '__main__':
+
+    config = yaml.safe_load(open('../../particle.yml'))
+    run(config)
