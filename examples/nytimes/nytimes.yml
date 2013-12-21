@@ -46,7 +46,7 @@ twitter:
     pardata-new-test:
       limit: 200
       owner: brianabelson
-      screen_names: nytimes_twitter.txt
+      screen_names: nyt_twitter.txt
     members-of-congress:
       limit: 200
       owner: cspan
