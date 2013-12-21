@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from thready import threaded
+import yaml, json
 import logging
 
 from particle.facebook import facebook
@@ -24,7 +25,7 @@ class Particle:
       if filepath.endswith('.yml'):
         self.CONFIG = yaml.safe_load(open(filepath))
       elif filepah.endswith('.json'):
-        self.CONFIG = yaml.safe_load(open(filepath))
+        self.CONFIG = json.load(open(filepath))
     elif isinstance(config, dict):
         self.CONFIG = config
 

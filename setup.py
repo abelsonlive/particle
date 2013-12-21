@@ -24,6 +24,9 @@ setup(
     install_requires=[
     ],
     tests_require=[],
-    entry_points={
-    }
+        entry_points = {
+          'console_scripts': [
+                'particle = particle:cli', 
+          ]
+        }
 )
