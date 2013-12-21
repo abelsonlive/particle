@@ -3,7 +3,6 @@ particle
 `particle` is a tool for collecting data about links on Twitter, Facebook, Webpages, and RSS feeds (for now). It joins this data together by a common url and bucketed timestamp.  This enables analysis similar to that which I discuss in this [blog post](http://brianabelson.com/open-news/2013/11/14/Pageviews-above-replacement.html). `particle` is like [`pollster`](https://github.com/stdbrouw/pollster) but not as developed and nowhere near as sophisticated. I just didn't want to bother learning coffeescript so I built my own version :).
 
 ## Configuration
-----------------
 
 `particle` runs off of a yaml config file which contains information about the data sources you want to collect, referred to here as `particle.yml`. If you want to see an example of such a file, check out [this one](http://github.com/abelsonlive/particle/examples/nytimes/nytimes.yml), though we'll discuss it in more detail below.
 
@@ -21,7 +20,6 @@ p.run(tasks=['twitter', 'facebook'])
 ```
 
 ## `particle.yml`
------------------
 
 ### Global settings
 
