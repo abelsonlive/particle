@@ -122,7 +122,7 @@ def run(config):
       scrape_promo_page(page_arg_set)
   else:
     page_arg_sets = [(url, slug, config) for slug, url in pages.iteritems()]
-    threaded(page_arg_sets, scrape_promo_page, 2, 10)
+    threaded(page_arg_sets, scrape_promo_page, 5, 20)
 
 if __name__ == '__main__':
 
