@@ -47,7 +47,7 @@ class Particle:
 
   def run(self, 
           tasks=["twitter", "facebook", "rssfeeds", "promopages"], 
-          num_threads=2, 
+          num_threads=4, 
           max_queue=4):
     
     # check if tasks is not a list
