@@ -19,12 +19,12 @@ def get_image_for_a_link(link):
         w = int(img.get_attribute("width"))
         h = int(img.get_attribute("height"))
         return dict(
-                pp_is_img = 1,
-                pp_img_width = w,
-                pp_img_height = h,
-                pp_img_area = w*h,
-                pp_img_src = img.get_attribute("src")
-            )
+            pp_is_img = 1,
+            pp_img_width = w,
+            pp_img_height = h,
+            pp_img_area = w*h,
+            pp_img_src = img.get_attribute("src")
+        )
     else:
         return dict(pp_is_img=0)
 
@@ -102,8 +102,10 @@ def scrape_links(links_arg_set):
     
     link_arg_sets = [(promo_url, l, time_bucket, data_source, config) for l in links]
     
-    for link_arg_set in link_arg_sets:
-        scrape_link(link_arg_set)
+    # for link_arg_set in link_arg_sets:
+    #     scrape_link(link_arg_set)
+
+    threaded(link_arg_sets, scrape_link, 5, 20)
 
 def scrape_promo_page(page_arg_set):
     promo_url, data_source, config = page_arg_set
