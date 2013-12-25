@@ -15,11 +15,13 @@ import logging
 
 FB_DATE_FORMAT = "%Y-%m-%dT%H:%M:%S+0000"
 
+
 def is_insights(page_id, config):
   """
   Determine whether we can collect insights for a page
   """
   return page_id in set(config['facebook']['insights_pages'])
+
 
 # link parsing
 def get_fb_link(post_data, config, unshorten=False):
@@ -39,6 +41,7 @@ def get_fb_link(post_data, config, unshorten=False):
   else:
     return None
 
+
 def parse_message_urls(message, config):
   """
   parse facebook message for links
@@ -52,6 +55,7 @@ def parse_message_urls(message, config):
   else:
     return [] 
 
+
 def get_message_urls(article_urls, message, config):
   """
   determine whether we should get message_urls
@@ -62,6 +66,7 @@ def get_message_urls(article_urls, message, config):
     return parse_message_urls(message, config)
   else:
     return []
+
 
 def get_insights_data(api, page_id, post_id):
   """
@@ -236,5 +241,3 @@ def run(config):
     page_arg_sets = [(api, page_id, config) for page_id in page_ids]
     threaded(page_arg_sets, get_new_data_for_page, 5, 20)
 
-if __name__ == '__main__':
-  run()

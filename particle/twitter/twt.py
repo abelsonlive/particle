@@ -25,6 +25,7 @@ def connect(config):
 
   return api
 
+
 def add_list_member(list_member_arg_set):
 
   screen_name, slug, owner_screen_name, api = list_member_arg_set
@@ -41,6 +42,7 @@ def add_list_member(list_member_arg_set):
 
   else:
     logging.info( "TWT\tadding %s to list: %s for user: %s" % (screen_name, slug, owner_screen_name) )
+
 
 def generate_list(api, slug, list_dict):
 
@@ -81,13 +83,15 @@ def generate_list(api, slug, list_dict):
     ]
     threaded(list_member_arg_sets, add_list_member, 30, 200)
 
+
 def generate_lists(config):
   
-  logging.info('TWITTER\tupdating lists')
-
   api = connect(config)
   for slug, list_dict in config['twitter']['lists'].iteritems():
-    generate_list(api, slug, list_dict)
+    if list_dict.has_key('screen_names'):
+      logging.info('TWITTER\tupdating list %s' % slug)
+      generate_list(api, slug, list_dict)
+
 
 def get_list_timelines(config):
   api = connect(config)
