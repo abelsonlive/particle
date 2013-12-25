@@ -83,7 +83,7 @@ def generate_list(api, slug, list_dict):
 
 def generate_lists(config):
   
-  logging.info('updating twitter lists')
+  logging.info('TWITTER\tupdating lists')
 
   api = connect(config)
   for slug, list_dict in config['twitter']['lists'].iteritems():
@@ -93,7 +93,7 @@ def get_list_timelines(config):
   api = connect(config)
   list_list = []
   for slug, list_dict in config['twitter']['lists'].iteritems():
-    logging.info( "INFO\tTWITTER\tgetting new data for twitter.com/%s/lists/%s" % (list_dict['owner'], slug) )
+    logging.info( "TWITTER\tgetting new data for twitter.com/%s/lists/%s" % (list_dict['owner'], slug) )
     tweets = api.list_timeline(
             owner_screen_name = list_dict['owner'], 
             slug =  slug,

@@ -74,7 +74,7 @@ def parse_one_entry(entry_arg_set):
 
       # parse content
       if entry.has_key('summary'):
-        rss_content = strip_tags(entry['summary'])
+        rss_content = entry['summary']
       else:
         rss_content = None
 
@@ -104,7 +104,7 @@ def parse_one_entry(entry_arg_set):
       )
       
       value = json.dumps({data_source: complete_datum})
-      logging.info( "RSSFEEDS\tNEW POST on %s re: %s" % (data_source, article_url) )
+      logging.info( "RSSFEEDS\tNew post on %s re: %s" % (data_source, article_slug) )
       
       # upsert the data
       upsert_rss_pub(article_url, article_slug, value)

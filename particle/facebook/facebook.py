@@ -201,7 +201,7 @@ def get_new_data_for_page(page_arg_set):
   try:
     acct_data = api.get(page_id)
   except Exception as e:
-    logging.error( e )
+    logging.error('FACEBOOK\t%s does not exist' % page_id)
     return None
   else:
     # determine limit

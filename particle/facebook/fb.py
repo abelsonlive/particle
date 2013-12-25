@@ -17,7 +17,7 @@ def generate_extended_access_token(config):
     Get an extended OAuth access token.
 
     :param access_token: A string describing an OAuth access token.
-    :param application_id: An integer describing the Facebook application's ID.
+    :param application_id: An icdsnteger describing the Facebook application's ID.
     :param application_secret_key: A string describing the Facebook application's secret key.
 
     Returns a tuple with a string describing the extended access token and a datetime instance

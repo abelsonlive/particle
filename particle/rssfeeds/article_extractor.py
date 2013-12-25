@@ -31,7 +31,7 @@ def extract_article(url):
     # return article data
     return {
       'extracted_title': Rdb.short_title().strip(),
-      'extracted_content': strip_tags(BP.getText()),
+      'extracted_content': BP.getText()
     }
 
   # otherwise return an empty dict
