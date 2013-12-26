@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # particle documentation build configuration file, created by
-# sphinx-quickstart on Wed Dec 25 19:26:00 2013.
+# sphinx-quickstart on Wed Dec 25 21:19:20 2013.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -98,10 +98,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = "haiku"
-# html_theme_options = {
-#     "rightsidebar": "false"
-# }
+html_theme = 'default'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
