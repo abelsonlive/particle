@@ -11,17 +11,15 @@
 Quickstart
 ----------
 
-## Configuration
+**particle** runs off of a ``yaml`` or ``json`` config file (or simply a ``python`` dictionary) which contains information about the data sources you want to collect. If you want to see an example of such a file, check out `this one <http://github.com/abelsonlive/particle/examples/nytimes/nytimes.yml>`_, or go straight to the `configuration documentation <config.html>`_.
 
-`particle` runs off of a ``yaml`` or ``json`` config file (or simply a ``python`` dict) which contains information about the data sources you want to collect, referred to here as `particle.yml`. If you want to see an example of such a file, check out [this one](http://github.com/abelsonlive/particle/examples/nytimes/nytimes.yml), though we'll discuss it in more detail below.
+When you start a new ``particle`` project, you'll want to indicate where this file is::
 
-When you start a new `particle` project, you'll want to tell `particle` where this file is:
-```
-from particle import Particle
+  from particle import Particle
 
-p = Particle('particle.yml')
-```
-This one function will read in your configuration file, set it as an environmental variable (`PARTICLE_CONFIG_PATH`), build a Twitter list of the the handles you want to follow, and insert a stable facebook API key (more on all this below).
+  p = Particle('particle.yml')
+
+This one function will set up your ``particle`` project 
 
 Now you're all set to run `particle`:
 ```
