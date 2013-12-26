@@ -54,8 +54,7 @@ class Particle:
     if isinstance(tasks, basestring):
       tasks = [tasks]
 
-    # run them
-    # for t in tasks:
-    #   self._execute(t)
     threaded(tasks, self._execute, num_threads= num_threads,  max_queue = max_queue)
-    
+
+    def __repr__(self):
+        return '<Particle>'
