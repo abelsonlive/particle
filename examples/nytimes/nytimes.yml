@@ -50,5 +50,13 @@ twitter:
     members-of-congress:
       limit: 200
       owner: cspan
-      screen_names:
-        -
+
+promopages:
+  nyt_homepage: http://www.nytimes.com/
+  nyt_mobile: http://mobile.nytimes.com/
+  nyt_most_emailed: http://www.nytimes.com/most-popular-emailed
+
+rssfeeds:
+  nyt_timeswire:
+    feed_url: http://www.nytimes.com/timeswire/feeds/
+    full_text: false
