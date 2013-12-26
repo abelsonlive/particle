@@ -1,7 +1,7 @@
 tweepy
 facepy
-pyyaml
 redis
+pyyaml
 pytz
 selenium
 flask

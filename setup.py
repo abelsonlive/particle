@@ -12,17 +12,16 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         ],
-    keywords='',
+    keywords='analytics, data science, social media',
     author='Brian Abelson',
-    author_email='',
+    author_email='brianabelson@gmail.com',
     url='http://github.com/abelsonlive/particle',
     license='MIT',
     packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
     namespace_packages=[],
     include_package_data=False,
     zip_safe=False,
-    install_requires=[
-    ],
+    install_requires = [],
     tests_require=[],
         entry_points = {
           'console_scripts': [
