@@ -10,4 +10,4 @@ particle: track article promotion.
 .. toctree::
    :hidden:
 
-**particle** is a tool for collecting data about links on Twitter, Facebook, Webpages, and RSS feeds (for now). It joins this data together by a common url and bucketed timestamp.  This enables analysis similar to that which I discuss in this `blog post <http://brianabelson.com/open-news/2013/11/14/Pageviews-above-replacement.html>`. **particle** is like `pollster <https://github.com/stdbrouw/pollster>` but not as developed and nowhere near as sophisticated. I just didn't want to bother learning coffeescript so I built my own version :).
+**particle** is a tool for collecting data about links on Twitter, Facebook, Webpages, and RSS feeds (for now). It joins this data together by a common url and bucketed timestamp.  This enables analysis similar to that which I discuss in this `blog post <http://brianabelson.com/open-news/2013/11/14/Pageviews-above-replacement.html>`_. **particle** is like `pollster <https://github.com/stdbrouw/pollster>`_ but not as developed and nowhere near as sophisticated. I just didn't want to bother learning coffeescript so I built my own version :).
