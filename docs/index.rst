@@ -3,20 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-particle: track the promotion of articles on the web
+particle: track article promotion
 ====================================
 
 Contents:
 
 .. toctree::
    :hiddeen:
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
