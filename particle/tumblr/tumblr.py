@@ -1,4 +1,5 @@
-## TODO
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import pytumblr
 import logging

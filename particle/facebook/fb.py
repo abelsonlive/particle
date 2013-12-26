@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import os
@@ -6,8 +6,9 @@ import facepy
 import yaml
 from datetime import datetime, timedelta
 from urlparse import parse_qs
-from particle.common import DEBUG
 import logging
+
+from particle.common import DEBUG
 
 def connect(config):
     return facepy.GraphAPI(config['facebook']['stable_access_token'])

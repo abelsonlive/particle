@@ -1,14 +1,15 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import json
 import tweepy
 from thready import threaded
 from datetime import datetime
+import logging
+
 from particle.twitter import twt
 from particle.common import db, DEBUG
 from particle.helpers import *
-import logging
 
 TWT_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 

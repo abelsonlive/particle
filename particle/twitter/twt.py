@@ -1,11 +1,11 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import tweepy
 from thready import threaded
-from particle.common import DEBUG
 import logging
 
+from particle.common import DEBUG
 
 def connect(config):
   """

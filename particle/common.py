@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import redis
-import yaml
 
 # GLOBAL settings
 DEBUG = False

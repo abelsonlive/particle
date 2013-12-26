@@ -7,10 +7,10 @@ import json
 import re
 from flask import Response, request
 import dateutil.parser
+import logging
+
 from particle.helpers import *
 from particle.common import db
-
-import logging
 
 urllib3_logger = logging.getLogger('urllib3')
 urllib3_logger.setLevel(logging.CRITICAL)

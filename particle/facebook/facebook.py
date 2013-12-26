@@ -1,17 +1,16 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# import sys
-# sys.path.append('../../')
 
 import json
 from thready import threaded
+from pprint import pprint
+from datetime import datetime
+import logging
 
 from particle.common import db, DEBUG
 from particle.facebook import fb
 from particle.helpers import *
-from pprint import pprint
-from datetime import datetime
-import logging
+
 
 FB_DATE_FORMAT = "%Y-%m-%dT%H:%M:%S+0000"
 
