@@ -19,7 +19,7 @@ When you start a new ``particle`` project, you'll want to indicate where this fi
 
   p = Particle('particle.yml')
 
-This one function will set up your ``particle`` project and deal with any necessary authentication with external API's.
+This one function will set up your ``particle`` project and deal with any necessary authentication with external API's (more on all this in the `configuration documentation <config.html>`_.
 
 Now you're all set to run ``particle``::
 
@@ -30,6 +30,12 @@ Alternatively, you can run this same sequence of functions via the command line 
 .. code-block:: bash
   
   $ particle run -c particle.yml
+
+Now put ``particle`` on a ``cron`` and let it go!
+
+.. code-block:: bash
+
+  */10 * * * * cd path/to/particle/project/ && particle run -c particle.yml
 
 
 Contents
