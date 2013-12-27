@@ -169,7 +169,7 @@ Data
 Once again, you can specify the number of posts to look through for each user name, now called ``page_limit`` (you'll see why, below)::
 
   page_limit: 10
-
+a
 In addition, if you have access to `Facebook Insights <https://www.facebook.com/help/search/?q=insights>`_ for a set of pages, ``particle`` can grab highly detailed information about how people engaged with posts on these pages over time. You can specify this in ``particle.yml`` as follows::
 
   insights_pages:
@@ -187,9 +187,10 @@ Putting it all together, your ``facebook`` settings might look something like th
     temp_access_token: xxx
     stable_access_token: xxx
     stable_access_token_expires_at: 0123456789
-     pages:
+    pages:
     - nytimes
     - modernlove
+    page_limit: 10
     insights_pages:
     - nytimes 
     insights_limit: 200
