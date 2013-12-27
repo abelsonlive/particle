@@ -11,11 +11,11 @@ URLs
 
 ``particle`` tries really hard to find specific links around the web. You can set the patterns of these links in the configuration file (referred to as ``particle.yml`` from here on)::
 
-global:
-  content_regexes:
-  - .*\.nytimes\.com/(.*/)?[0-9]+/[0-9]+/[0-9]+/.*
-  short_regexes:
-  - nyti\.ms/\w+
+  global:
+    content_regexes:
+    - .*\.nytimes\.com/(.*/)?[0-9]+/[0-9]+/[0-9]+/.*
+    short_regexes:
+    - nyti\.ms/\w+
 
 ``content_regexes`` represents a list of regular expressions you want to use to detect links to content. In this case, I've written a regular expression that will find links to New York Times content::
 
@@ -66,10 +66,10 @@ Data Sources
 --------------
 
 ``particle`` currently supports collection from four data sources:
-* Twitter
-* Facebook
-* RSS Feeds
-* Web Pages (we'll call them 'Promopages' below)
+  * Twitter
+  * Facebook
+  * RSS Feeds
+  * Web Pages (we'll call them 'Promopages' below)
 
 Let's go through each of these and discuss how to customize your ``particle`` project to your needs.
 
@@ -118,19 +118,19 @@ You can also set the maximum number of of posts to search through at any given t
  
 Putting it all together, your ``twitter`` settings might look something like this::
 
-twitter:
-  access_token: xxx
-  access_token_secret: xxx
-  consumer_key: xxx
-  consumer_secret: xxx
-  lists:
-    nytimes-twitter-accounts:
-      limit: 200
-      owner: brianabelson
-      screen_names: nytimes_twitter.txt
-    members-of-congress:
-      limit: 200
-      owner: cspan
+  twitter:
+    access_token: xxx
+    access_token_secret: xxx
+    consumer_key: xxx
+    consumer_secret: xxx
+    lists:
+      nytimes-twitter-accounts:
+        limit: 200
+        owner: brianabelson
+        screen_names: nytimes_twitter.txt
+      members-of-congress:
+        limit: 200
+        owner: cspan
 
 Facebook
 ~~~~~~~~~~~~~~
@@ -206,13 +206,11 @@ Here the key of the promopage - ``nyt_homepage`` - indicates how the datastore w
 RSS Feeds
 ~~~~~~~~~~~~~~
 
-Finally, ``particle`` also allows you to pull in content from abrtrary rss feeds. Similar to ``promopages``, you set these in ``particle.yml`` by listing key-value pairs that correspond to the name of the feed and the url of the feed. In this case, however, the value consists of two parameters: ``feed_url`` - the url of the feed - and ``feed_text`` which takes a boolean value that indicates whether or not the feed is contains the entirety of an articles content. If ``feed_text`` is set to "false", ``particle`` will attempt to scrape these pages for the article text using a combination of `boilerpipe <https://code.google.com/p/boilerpipe/>`_ and `readability <https://github.com/buriy/python-readability>`_. Here's all that in ``particle.yml``:
+Finally, ``particle`` also allows you to pull in content from abrtrary rss feeds. Similar to ``promopages``, you set these in ``particle.yml`` by listing key-value pairs that correspond to the name of the feed and the url of the feed. In this case, however, the value consists of two parameters: ``feed_url`` - the url of the feed - and ``feed_text`` which takes a boolean value that indicates whether or not the feed is contains the entirety of an articles content. If ``feed_text`` is set to "false", ``particle`` will attempt to scrape these pages for the article text using a combination of `boilerpipe <https://code.google.com/p/boilerpipe/>`_ and `readability <https://github.com/buriy/python-readability>`_. Here's all that in ``particle.yml``::
 
-```
   nyt_timeswire:
     feed_url: http://www.nytimes.com/timeswire/feeds/
     full_text: false
-```
 
 Sample Config File
 ~~~~~~~~~~~~~~
@@ -232,6 +230,9 @@ Here's what a sample ``particle.yml`` file looks like::
     app_id: abc
     app_secret: def
     temp_access_token: ghi
+    insights_pages:
+    - nytimes
+    insights_limit: 200
     page_limit: 10
     pages:
     - DealBook
@@ -286,6 +287,6 @@ Here's what a sample ``particle.yml`` file looks like::
 Database
 --------------
 
-The data is stored in ``redis`` as a sorted set in which the keys are resolved article urls, the rank is the bucketed timestamp, and the value is a json string, with the key as the data source and the value as the data associated with that event.This means, by querying redis you can quickly get all the events for a url at a particular time, within a timerange, or across the entire span of the data without doing any joins.
+The data is stored in ``redis`` as a sorted set in which the keys are resolved article urls, the rank is the bucketed timestamp, and the value is a json string, with the key as the data source and the value as the data associated with that event.This means, by querying ``redis`` you can quickly get all the events for a url at a particular time, within a set timerange, or across the entire span of the data without doing any joins.
 
 Read more about how to access the data in the `API documentation <web-api.html>`_.
