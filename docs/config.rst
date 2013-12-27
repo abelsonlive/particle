@@ -265,7 +265,7 @@ Here's what a sample ``particle.yml`` file looks like::
     consumer_key: pqr
     consumer_secret: sto
     lists:
-      pardata-new-test:
+      nytimes-twitter-accounts:
         limit: 200
         owner: brianabelson
         screen_names: nyt_twitter.txt
@@ -287,6 +287,6 @@ Here's what a sample ``particle.yml`` file looks like::
 Database
 --------------
 
-The data is stored in ``redis`` as a sorted set in which the keys are resolved article urls, the rank is the bucketed timestamp, and the value is a json string, with the key as the data source and the value as the data associated with that event.This means, by querying ``redis`` you can quickly get all the events for a url at a particular time, within a set timerange, or across the entire span of the data without doing any joins.
+The data is stored in ``redis`` as a sorted set in which the keys are resolved article urls, the rank is the bucketed timestamp, and the value is a json string, with the key as the data source and the value as the data associated with that event. This means you can quickly get all the events (or just a specific set of events) for a url at a particular time, within a set timerange, or across the entire span of the data without doing any joins.
 
 Read more about how to access the data in the `API documentation <web-api.html>`_.

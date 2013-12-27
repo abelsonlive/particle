@@ -48,19 +48,27 @@ def tz_adj(dt, config):
     else:
         return mytz.normalize(dt.astimezone(mytz))
 # database
-def current_datetime(config):
+def current_datetime(config=None):
   """
   generate datetime bucket for sorted set ranking
   """
-  tz = config['global']['newsroom_timezone']
+  try:
+    tz = config['global']['newsroom_timezone']
+  except:
+    tz = 'UTC'
+
   mytz = pytz.timezone(tz)
   return datetime.now(tz=mytz)
 
-def current_timestamp(config):
+def current_timestamp(config=None):
   """
   generate datetime bucket for sorted set ranking
   """
-  tz = config['global']['newsroom_timezone']
+  try:
+    tz = config['global']['newsroom_timezone']
+  except:
+    tz = 'UTC'
+    
   mytz = pytz.timezone(tz)
   return int(datetime.now(tz=mytz).strftime('%s'))
 

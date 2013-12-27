@@ -19,4 +19,14 @@ def cli():
     particle.run(tasks = tasks)
 
   elif sys.argv[1] == 'web':
-    api()
+    parser = OptionParser()
+    parser.add_option("-p", '--port', dest="port", default = 3030)
+    parser.add_option("-d", '--debug', dest="debug", default = True)
+    (options, args) = parser.parse_args()
+
+    if str(options.debug).lower() == 'true':
+        debug = True
+    else:
+        debug = False
+
+    api(port = options.port, debug = debug)

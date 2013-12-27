@@ -18,31 +18,36 @@ urllib3_logger.setLevel(logging.CRITICAL)
 app = flask.Flask(__name__)
 
 class JSONEncoder(json.JSONEncoder):
-    """ This encoder will serialize all entities that have a to_dict
-    method by calling that method and serializing the result. """
+  """ This encoder will serialize all entities that have a to_dict
+  method by calling that method and serializing the result. """
 
-    def encode(self, obj):
-        if hasattr(obj, 'to_dict'):
-            obj = obj.to_dict()
-        return super(JSONEncoder, self).encode(obj)
+  def encode(self, obj):
+    if hasattr(obj, 'to_dict'):
+      obj = obj.to_dict()
+    return super(JSONEncoder, self).encode(obj)
 
-    def default(self, obj):
-        if hasattr(obj, 'as_dict'):
-            return obj.as_dict()
-        if isinstance(obj, datetime):
-            return obj.isoformat()
-        if hasattr(obj, 'to_dict'):
-            return obj.to_dict()
-        raise TypeError("%r is not JSON serializable" % obj)
+  def default(self, obj):
+
+    if hasattr(obj, 'as_dict'):
+      return obj.as_dict()
+
+    if isinstance(obj, datetime):
+      return obj.isoformat()
+
+    if hasattr(obj, 'to_dict'):
+      return obj.to_dict()
+
+    raise TypeError("%r is not JSON serializable" % obj)
 
 
 def jsonify(obj, status=200, headers=None):
-    """ Custom JSONificaton to support obj.to_dict protocol. """
-    jsondata = json.dumps(obj, cls=JSONEncoder)
-    if 'callback' in request.args:
-        jsondata = '%s(%s)' % (request.args.get('callback'), jsondata)
-    return Response(jsondata, headers=headers,
-                    status=status, mimetype='application/json')
+  """ Custom JSONificaton to support obj.to_dict protocol. """
+  jsondata = json.dumps(obj, cls=JSONEncoder)
+
+  if 'callback' in request.args:
+    jsondata = '%s(%s)' % (request.args.get('callback'), jsondata)
+
+  return Response(jsondata, headers=headers, status=status, mimetype='application/json')
 
 @app.route("/")
 def query():
@@ -121,21 +126,21 @@ def query():
 
 @app.route("/recent-articles/")
 def recent():
-  # parse args
-  start = request.args.get('start', 0)
-  end = request.args.get('end', 1e11)
-  order = request.args.get('order', 'desc')
+  
+  # parse arg
+  limit = request.args.get('limit', 50)
+
+  # just look two days back
+  end = current_timestamp()
+  start = end - 24*60*60*2
   
   # fetch data
-  key ='article_sorted_set'
+  key = 'article_sorted_set'
   results = db.zrangebyscore(key, min = start, max = end)
 
-  if order=='desc':
-    results = [r for r in reversed(results)]
-
   # turn it into a json list
-  return "[%s]" % ",".join(results[0:21])
+  return "[%s]" % ",".join(results[0:limit+1])
 
-def api(host='0.0.0.0', port=5000, debug=True):
+def api(host='0.0.0.0', port=3030, debug=True):
   app.debug = debug
   app.run(host=host, port=port)
