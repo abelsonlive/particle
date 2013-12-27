@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='particle',
-    version='0.0.3',
+    version='0.0.4',
     description="",
     long_description="",
     classifiers=[
