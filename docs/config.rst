@@ -214,6 +214,75 @@ Finally, ``particle`` also allows you to pull in content from abrtrary rss feeds
     full_text: false
 ```
 
+Sample Config File
+~~~~~~~~~~~~~~
+
+Here's what a sample ``particle.yml`` file looks like::
+
+  global:
+    bucket: 10
+    newsroom_timezone: America/New_York
+    phantomjs: /usr/local/bin/phantomjs
+    content_regexes:
+    - .*\.nytimes\.com/(.*/)?[0-9]+/[0-9]+/[0-9]+/.*
+    short_regexes:
+    - nyti\.ms/\w+
+
+  facebook:
+    app_id: abc
+    app_secret: def
+    temp_access_token: ghi
+    page_limit: 10
+    pages:
+    - DealBook
+    - modernlove
+    - NYTDesign
+    - nytimes
+    - nytimescivilwar
+    - nytimesdining
+    - nytimesgiving
+    - nytimeslearning
+    - nytimesmovies
+    - nytimesphoto
+    - nytimespolitics
+    - nytimesscience
+    - nytimestheater
+    - nytimesthechoice
+    - nytimestravel
+    - NYTMetro
+    - nytscoop
+    - nyttravelshow
+    - RoomforDebate
+    - TimesOpen
+    - timestalks
+    - tmagazine
+    - WellNYT
+
+  twitter:
+    access_token: jkl
+    access_token_secret: mno
+    consumer_key: pqr
+    consumer_secret: sto
+    lists:
+      pardata-new-test:
+        limit: 200
+        owner: brianabelson
+        screen_names: nyt_twitter.txt
+      members-of-congress:
+        limit: 200
+        owner: cspan
+
+  promopages:
+    nyt_homepage: http://www.nytimes.com/
+    nyt_mobile: http://mobile.nytimes.com/
+    nyt_most_emailed: http://www.nytimes.com/most-popular-emailed
+
+  rssfeeds:
+    nyt_timeswire:
+      feed_url: http://www.nytimes.com/timeswire/feeds/
+      full_text: false
+
+
 Database
 --------------
 
