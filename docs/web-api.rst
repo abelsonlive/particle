@@ -20,7 +20,7 @@ Or alternatively via the command line interface:
 
 .. code-block:: bash
 
-  $ particle web -p 8000 -d True
+  $ particle api -p 8000 -d True
 
 Endpoints
 ---------

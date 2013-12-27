@@ -18,7 +18,7 @@ def cli():
     particle = Particle(filepath=options.config)
     particle.run(tasks = tasks)
 
-  elif sys.argv[1] == 'web':
+  elif sys.argv[1] == 'api':
     parser = OptionParser()
     parser.add_option("-p", '--port', dest="port", default = 3030)
     parser.add_option("-d", '--debug', dest="debug", default = True)
