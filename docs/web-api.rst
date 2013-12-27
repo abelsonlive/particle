@@ -5,10 +5,7 @@ Web API
 Starting the API
 ----------------
 
-``particle`` comes with a flexible ``flask`` API for serving the data it captures.  There are two endpoints:
-
-  * Query
-  * Recent Articles
+``particle`` comes with a flexible ``flask`` API for serving the data it captures.
 
 You can start up this API like so::
 
