@@ -24,7 +24,7 @@ Endpoints
 
 Query
 ~~~~~~~~
-**<api-url>/recent-articles/<key-value pairs>**
+**<api-url>/<key-value pairs>**
 
 ``particle`` comes with a flexible endpoint for querying the data by a given url.  Here are the parameters:
 
