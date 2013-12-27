@@ -1,4 +1,4 @@
 from particle import Particle
 
-nyt = Particle('nytimes.yml')
-nyt.run()
+p = Particle('nytimes.yml')
+p.run()
