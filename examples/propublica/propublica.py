@@ -1,4 +1,4 @@
 from particle import Particle
 
-pp = Particle('propublica.yml')
-pp.run()
+p = Particle('propublica.yml')
+p.run()
