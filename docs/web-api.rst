@@ -1,5 +1,5 @@
 
-Web API documentation
+Web API
 =================
 
 Starting the API
