@@ -37,7 +37,7 @@ Now put ``particle`` on a ``cron`` and let it go!
 
   */10 * * * * cd path/to/particle/project/ && particle run -c particle.yml
 
-Quickstart
+Examples
 ----------
 
 You can check out some simple examples in the `github repository <https://github.com/abelsonlive/particle/tree/master/examples>`_.
