@@ -57,6 +57,7 @@ Putting it all together, your ``global`` settings should look something like thi
   global:
     bucket: 10
     newsroom_timezone: America/New_York
+    phantomjs: /usr/local/bin/phantomjs
     content_regexes:
     - .*\.nytimes\.com/(.*/)?[0-9]+/[0-9]+/[0-9]+/.*
     short_regexes:
@@ -196,7 +197,7 @@ Putting it all together, your ``facebook`` settings might look something like th
 Promopages
 ~~~~~~~~~~~~~~
 
-A powerful feature of ``particle`` is it's ability to pull in links from arbitrary pages and extract metadata about those links, like their position, font size,  associated text, and image attributes. This feature works by harnessing ``phantomjs`` and ``selenium`` to render the pages in a headless browser and crawl the links to match patterns. You can use it to detect links on homepages or really any other site around the web. This function is simply customized in ``particle.yml``::
+A powerful feature of ``particle`` is its ability to pull in links from arbitrary pages and extract metadata about those links, like their position, font size,  associated text, and image attributes. This feature works by harnessing ``phantomjs`` and ``selenium`` to render the pages in a headless browser and scan the links to match patterns. You can use it to detect links on homepages or really any other site around the web. This function is simply customized in ``particle.yml``::
 
   promopages:
     nyt_homepage: http://www.nytimes.com/

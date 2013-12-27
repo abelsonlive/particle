@@ -27,31 +27,31 @@ Endpoints
 
 Query
 ~~~~~~~~
-<api-url>/recent-articles/<key-value pairs>
+**<api-url>/recent-articles/<key-value pairs>**
 
 ``particle`` comes with a flexible endpoint for querying the data by a given url.  Here are the parameters:
 
-  * url (required)
+  * ``url`` (required)
     - The URL of the article you're interested in.
-  * data_sources
+  * ``data_sources``
     - A comma-seprated list of the following values:
-      *``twitter_<screen_name>``
-      * ``facebook_<page_id>``
-      * ``facebook_insights_<page_id>`` 
-      * ``<rss_feed_name>``
-      * ``<promopage_name>``
-    - In addition, you can simply use ``twitter`` or ``facebook`` and return all the sources that contain those strings.
-  * start
+      - ``twitter_<screen_name>``
+      - ``facebook_<page_id>``
+      - ``facebook_insights_<page_id>`` 
+      - ``<rss_feed_name>``
+      - ``<promopage_name>``
+    - In addition, you can simply use "``twitter``" or "``facebook``" and return all the sources that contain those strings.
+  * ``start``
     - A unix timestamp connoting the start of the range of events to search for.
-  * end 
+  * ``end``
     - A unix timestamp connoting the end of the range of events to search for.
-  * timestamp
+  * ``timestamp``
     - A unix timestamp connoting the specific time window of events.
-  * order
+  * ``order``
     - What direction to sort the events: ``asc`` or ``desc``
-  * include_article
+  * ``include_article``
     - Whether or not to include the article data obtained from ``rssfeeds``.
-  * include_keys
+  * ``include_keys``
     - Whether or not to include the data_source names as keys of each event (usually only advisable if you're querying for one data source).
 
 A sample datum might look like this::
@@ -93,10 +93,10 @@ A sample datum might look like this::
 
 Recent Articles
 ~~~~~~~~~~~~~~~
-<api-url>/recent-articles/<key-value pairs>
+**<api-url>/recent-articles/<key-value pairs>**
 
 ``particle`` includes an endpoint for tracking the most recent articles to have entered the database.  This is ideal for pairing with `pollster <http://github.com/stdbrouw/pollster>`_.
 
-  * limit
+  * ``limit``
     - how many articles to return (default = 50)
   
