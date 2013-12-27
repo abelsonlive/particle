@@ -18,3 +18,4 @@ particle.yml
 dev/
 nytimes_twitter.txt
 logs/
+make.sh
