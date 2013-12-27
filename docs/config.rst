@@ -197,7 +197,7 @@ Putting it all together, your ``facebook`` settings might look something like th
 Promopages
 ~~~~~~~~~~~~~~
 
-A powerful feature of ``particle`` is its ability to pull in links from arbitrary pages and extract metadata about those links, like their position, font size,  associated text, and image attributes. This feature works by harnessing ``phantomjs`` and ``selenium`` to render the pages in a headless browser and scan the links to match patterns. You can use it to detect links on homepages or really any other site around the web. This function is simply customized in ``particle.yml``::
+A powerful feature of ``particle`` is its ability to pull in links from arbitrary pages and extract metadata about those links, like their position, font size,  associated text, and image attributes. This feature works by harnessing ``phantomjs`` and ``selenium`` to render the pages in a headless browser and scan the links to match the specified url patterns. You can use it to detect links on homepages or really any other site around the web. This function is simply customized in ``particle.yml``::
 
   promopages:
     nyt_homepage: http://www.nytimes.com/
@@ -207,7 +207,7 @@ Here the key of the promopage - ``nyt_homepage`` - indicates how the datastore w
 RSS Feeds
 ~~~~~~~~~~~~~~
 
-Finally, ``particle`` also allows you to pull in content from abrtrary rss feeds. Similar to ``promopages``, you set these in ``particle.yml`` by listing key-value pairs that correspond to the name of the feed and the url of the feed. In this case, however, the value consists of two parameters: ``feed_url`` - the url of the feed - and ``feed_text`` which takes a boolean value that indicates whether or not the feed is contains the entirety of an articles content. If ``feed_text`` is set to "false", ``particle`` will attempt to scrape these pages for the article text using a combination of `boilerpipe <https://code.google.com/p/boilerpipe/>`_ and `readability <https://github.com/buriy/python-readability>`_. Here's all that in ``particle.yml``::
+Finally, ``particle`` also allows you to pull in content from abrtrary RSS feeds. Similar to ``promopages``, you set these in ``particle.yml`` by listing key-value pairs that correspond to the name of the feed and the url of the feed. In this case, however, the value consists of two parameters: ``feed_url`` - the url of the feed - and ``full_text`` which takes a boolean value that indicates whether or not the feed contains the full text of the articles. If ``full_text`` is set to "false", ``particle`` will attempt to scrape the article text using a combination of `boilerpipe <https://code.google.com/p/boilerpipe/>`_ and `readability <https://github.com/buriy/python-readability>`_. Here's all that in ``particle.yml``::
 
   nyt_timeswire:
     feed_url: http://www.nytimes.com/timeswire/feeds/
