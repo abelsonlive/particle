@@ -17,6 +17,9 @@ Command Line Interface
   optional arguments:
     -h, --help  show this help message and exit
 
+
+.. code-block:: bash
+
   $ particle run --help
   usage: particle [options] run [-h] [-c CONFIG] [-t TASKS]
 
@@ -28,6 +31,8 @@ Command Line Interface
     -t TASKS, --tasks TASKS
                           A comma-separated list of tasks to run. 
                           default = twitter,facebook,rssfeeds,promopages
+
+.. code-block:: bash
 
   $ particle api --help
   usage: particle [options] api [-h] [-p PORT] [-d]

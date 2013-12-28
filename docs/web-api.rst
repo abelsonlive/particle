@@ -1,5 +1,5 @@
 
-Command Line Interface
+Web API
 =================
 
 Starting the API
@@ -24,7 +24,7 @@ Endpoints
 
 Query
 ~~~~~~~~
-**<api-url>/<key-value pairs>**
+**localhost:3030/<key-value pairs>**
 
 ``particle`` comes with a flexible endpoint for querying the data by a given url.  Here are the parameters:
 
@@ -90,7 +90,7 @@ A sample datum might look like this::
 
 Recent Articles
 ~~~~~~~~~~~~~~~
-**<api-url>/recent-articles/<key-value pairs>**
+**localhost:3030/recent-articles/<key-value pairs>**
 
 ``particle`` includes an endpoint for tracking the most recent articles to have entered the database.  This is ideal for pairing with `pollster <http://github.com/stdbrouw/pollster>`_.
 
