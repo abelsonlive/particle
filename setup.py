@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='particle',
-    version='0.0.5',
+    version='0.0.6',
     description="",
     long_description="",
     classifiers=[
@@ -28,7 +28,7 @@ setup(
         "python-dateutil >= 1.5",
         "pytz >= 2012d",
         "readability-lxml >= 0.3.0.2",
-        "cssslect >= 0.9.1",
+        "cssselect >= 0.9.1",
         "redis >= 2.8.0",
         "selenium >= 2.39.0",
         "thready >= 0.1.2",
