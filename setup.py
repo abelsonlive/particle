@@ -28,6 +28,7 @@ setup(
         "python-dateutil >= 1.5",
         "pytz >= 2012d",
         "readability-lxml >= 0.3.0.2",
+        "cssslect >= 0.9.1",
         "redis >= 2.8.0",
         "selenium >= 2.39.0",
         "thready >= 0.1.2",
