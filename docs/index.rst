@@ -46,7 +46,7 @@ You can check out some simple examples in the `github repository <https://github
 Amazon Machine Image
 ---------------------
 
-For convenience, I've built an Ubuntu AMI with all dependencies pre-installed.  Due to the large amount of multithreading, ``particle`` seems to work best on a medium instance.
+For convenience, I've built an Ubuntu AMI with all dependencies pre-installed.  Due to the large amount of multithreading, ``particle`` seems to work best on a small instance or larger.
 
 `EU West Ireland <https://console.aws.amazon.com/ec2/home?region=eu-west-1#launchAmi=ami-f3113b9a>`_
 
