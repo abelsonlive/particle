@@ -32,13 +32,13 @@ def cli():
     "-c", '--config', 
     dest="config", 
     default="particle.yml", 
-    help="The path to your configuration file.\ndefault = particle.yml"
+    help="The path to your configuration file.\r\ndefault = particle.yml"
   )
   parser_run.add_argument(
     "-t", '--tasks', 
     dest="tasks", 
     default="twitter,facebook,rssfeeds,promopages", 
-    help = 'A comma-separated list of tasks to run.\ndefault = twitter,facebook,rssfeeds,promopages'
+    help = 'A comma-separated list of tasks to run.\r\ndefault = twitter,facebook,rssfeeds,promopages'
   )
   parser_run.set_defaults(func=particle_runner)
 
@@ -47,13 +47,13 @@ def cli():
     "-p", '--port', 
     dest = "port", 
     default = 3030, 
-    help = 'The port on which to serve the API.\ndefault = 3030'
+    help = 'The port on which to serve the API.\r\ndefault = 3030'
   )
   parser_api.add_argument(
     "-d", '--debug', 
     dest = "debug", 
     action='store_true', 
-    help = 'Whether or not to run the API in debug mode.\ndefault = True'
+    help = 'Whether or not to run the API in debug mode.\r\ndefault = True'
   )
   parser_api.set_defaults(func=api_runner)
 
