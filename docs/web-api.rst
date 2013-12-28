@@ -1,5 +1,5 @@
 
-Web API
+Command Line Interface
 =================
 
 Starting the API

@@ -43,6 +43,21 @@ Examples
 You can check out some simple examples in the `github repository <https://github.com/abelsonlive/particle/tree/master/examples>`_.
 
 
+Amazon Machine Image
+---------------------
+
+For convenience, I've built an Ubuntu AMI with all dependencies pre-installed.  Due to the large amount of multithreading, ``particle`` seems to work best on a medium instance.
+
+`EU West Ireland <https://console.aws.amazon.com/ec2/home?region=eu-west-1#launchAmi=ami-811933e8>`_
+`US East Virginia <https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-811933e8>`_
+`US West N California  <https://console.aws.amazon.com/ec2/home?region=us-west-1#launchAmi=ami-811933e8>`_
+`US West Oregon <https://console.aws.amazon.com/ec2/home?region=us-west-2#launchAmi=ami-811933e8>`_
+`South America Sao Paulo  <https://console.aws.amazon.com/ec2/home?region=sa-east-1#launchAmi=ami-811933e8>`_
+`Asia Pacific Singapore <https://console.aws.amazon.com/ec2/home?region=ap-southeast-1#launchAmi=ami-811933e8>`_
+`Asia Pacific Tokyo <https://console.aws.amazon.com/ec2/home?region=ap-northeast-1#launchAmi=ami-811933e8>`_
+`Asia Pacific Sydney <https://console.aws.amazon.com/ec2/home?region=ap-southeast-2#launchAmi=ami-811933e8>`_
+
+
 Contents
 --------
 
@@ -52,4 +67,5 @@ Contents
    install
    config
    web-api
+   cli
 
