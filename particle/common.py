@@ -9,3 +9,4 @@ APP_DEBUG = True
 
 # initialize redis
 db = redis.StrictRedis(host='localhost', port=6379, db=0)
+

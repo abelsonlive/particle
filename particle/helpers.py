@@ -12,18 +12,31 @@ from pprint import pprint
 import string
 import json
 import logging
+from thready import threaded
+
+from particle.common import DEBUG
 
 requests_logger = logging.getLogger('requests')
 requests_logger.setLevel(logging.CRITICAL)
 
+log = logging.getLogger('particle')
+
+# wrapper for thready
+def threaded_or_serial(tasks, func, num_threads, max_queue):
+  if DEBUG:
+    for t in tasks:
+      func(t)
+  else:
+    threaded(tasks, func, num_threads, max_queue)
+
 # debug msg
 def print_output(article_url, time_bucket, value):
-  logging.info( "key: %s" % article_url )
-  logging.info( "rank: %s" % time_bucket )
-  logging.info( value )
+  log.info( "key: %s" % article_url )
+  log.info( "rank: %s" % time_bucket )
+  log.info( value )
+
 
 # DATE HELPERS #
-
 def round_datetime(dt, config):
   """
   round dateime object to set bucket
@@ -38,15 +51,15 @@ def round_datetime(dt, config):
   return int(dt.strftime('%s'))
 
 def tz_adj(dt, config):
-    tz = config['global']['newsroom_timezone']
-    utc = pytz.timezone("UTC")
-    mytz = pytz.timezone(tz)
-    try:
-        dt = dt.replace(tzinfo=utc)
-    except:
-        return None
-    else:
-        return mytz.normalize(dt.astimezone(mytz))
+  tz = config['global']['newsroom_timezone']
+  utc = pytz.timezone("UTC")
+  mytz = pytz.timezone(tz)
+  try:
+      dt = dt.replace(tzinfo=utc)
+  except:
+      return None
+  else:
+      return mytz.normalize(dt.astimezone(mytz))
 # database
 def current_datetime(config=None):
   """
@@ -108,6 +121,7 @@ def upsert_rss_pub(article_url, article_slug, value):
   if not db.sismember('article_set', article_url):
     # add it to the set
     db.sadd('article_set', article_url)
+    
   key = "%s:article" % article_slug
   db.set(key, value)
 
@@ -130,13 +144,15 @@ def is_article(link_url, config):
 
 # html stripping
 class MLStripper(HTMLParser):
-    def __init__(self):
-        self.reset()
-        self.fed = []
-    def handle_data(self, d):
-        self.fed.append(d)
-    def get_data(self):
-        return ''.join(self.fed)
+  def __init__(self):
+    self.reset()
+    self.fed = []
+
+  def handle_data(self, d):
+    self.fed.append(d)
+
+  def get_data(self):
+    return ''.join(self.fed)
 
 def strip_tags(html):
     s = MLStripper()
@@ -216,9 +232,9 @@ def is_short_link(url):
 
 def is_facebook_link(link):
   if re.search("facebook", link):
-      return True
+    return True
   else:
-      return False
+    return False
 
 def test_for_short_link(link, config):
   patterns = config['global']['short_regexes']
@@ -243,7 +259,7 @@ def unshorten_link(link, config):
         r = requests.get(l)
       
       except Exception as e:
-        logging.warning("unshorten_link, %s" % e)
+        log.warning("unshorten_link, %s" % e)
         
         # quit
         return l

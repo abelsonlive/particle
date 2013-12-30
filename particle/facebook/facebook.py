@@ -14,6 +14,8 @@ from particle.helpers import *
 
 FB_DATE_FORMAT = "%Y-%m-%dT%H:%M:%S+0000"
 
+log = logging.getLogger('particle')
+
 
 def is_insights(page_id, config):
   """
@@ -22,7 +24,6 @@ def is_insights(page_id, config):
   return page_id in set(config['facebook']['insights_pages'])
 
 
-# link parsing
 def get_fb_link(post_data, config, unshorten=False):
   """
   parse fb_post data for links
@@ -75,13 +76,16 @@ def get_insights_data(api, page_id, post_id):
   data = graph_results['data']
   insights = {}
   insights['includes_insights'] = True  
+  
   for d in data:
     val = d['values'][0]['value']
     if isinstance(val, dict):
       for k, v in val.iteritems():
         insights[k] = v
+
     else:
       insights[d['name']] = val
+
   return insights
 
 
@@ -95,7 +99,7 @@ def insert_new_post(post_arg_set):
     post_id = post_data['id'] if post_data.has_key('id') else None
 
   except Exception as e:
-    logging.error( e )
+    log.error( e )
 
   else:
     if is_insights(page_id, config):
@@ -152,7 +156,7 @@ def insert_new_post(post_arg_set):
         # always insert insights data
         if is_insights(page_id, config):
           
-          logging.info( "INSIGHTS\tAdding data from %s re: %s" % (page_id, article_slug) )
+          log.info( "INSIGHTS\tAdding data from %s re: %s" % (page_id, article_slug) )
           # 
           data_source = "facebook_insights_%s" % page_id 
           
@@ -177,7 +181,7 @@ def insert_new_post(post_arg_set):
         # only insert new posts
         elif not db.sismember('facebook_post_ids', post_id):
           
-          logging.info( "FACEBOOK\tnew post %s re: %s" % (post_id, article_slug) )
+          logging.info( "FACEBOOK\tNew post %s re: %s" % (post_id, article_slug) )
           
           # insert id
           db.sadd('facebook_post_ids', post_id)     
@@ -193,19 +197,20 @@ def insert_new_post(post_arg_set):
           # upload data to redis
           db.zadd(article_slug, time_bucket, value)
 
+
 def get_new_data_for_page(page_arg_set):
   """
   get all new posts on a page
   """
   api, page_id, config = page_arg_set
 
-  logging.info( "FACEBOOK\tgetting new data for facebook.com/%s" % page_id )
+  log.info( "FACEBOOK\tGetting new data for facebook.com/%s" % page_id )
   
   # fetch account data so we can associate the number of likes with the account AT THAT TIME
   try:
     acct_data = api.get(page_id)
   except Exception as e:
-    logging.error('FACEBOOK\t%s does not exist' % page_id)
+    log.error('FACEBOOK\t%s does not exist' % page_id)
     return None
   else:
     # determine limit
@@ -216,13 +221,10 @@ def get_new_data_for_page(page_arg_set):
 
     # get last 100 articles for this page
     page = api.get(page_id + "/posts", page=False, retry=5, limit=limit)
-    if DEBUG:
-      for post_data in page['data']:
-        post_arg_set = (api, post_data, acct_data, page_id, config)
-        insert_new_post(post_arg_set)
-    else:
-      post_arg_sets = [(api, post_data, acct_data, page_id, config) for post_data in page['data']]
-      threaded(post_arg_sets, insert_new_post, 20, 150)
+    post_arg_sets = [(api, post_data, acct_data, page_id, config) for post_data in page['data']]
+    
+    threaded_or_serial(post_arg_sets, insert_new_post, 20, 150)
+
 
 def run(config):
   """
@@ -230,13 +232,7 @@ def run(config):
   """
   page_ids = config['facebook']['pages']
   api = fb.connect(config)
-  if DEBUG:
-    for page_id in page_ids:
-      page_arg_set = (api, page_id, config)
-      get_new_data_for_page(page_arg_set)
-
-  # fetch account data so we can associate the number of likes with the account AT THAT TIME
-  else:
-    page_arg_sets = [(api, page_id, config) for page_id in page_ids]
-    threaded(page_arg_sets, get_new_data_for_page, 5, 20)
+  page_arg_sets = [(api, page_id, config) for page_id in page_ids]
+  
+  threaded_or_serial(page_arg_sets, get_new_data_for_page, 5, 20)
 

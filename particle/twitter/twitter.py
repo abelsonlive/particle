@@ -13,6 +13,8 @@ from particle.helpers import *
 
 TWT_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
+log = logging.getLogger('particle')
+
 def parse_tweet(tweet_arg_set):
   slug, t, config = tweet_arg_set
 
@@ -46,7 +48,7 @@ def parse_tweet(tweet_arg_set):
         # sluggify url
         article_slug = sluggify(article_url)
         screen_name = t.user.screen_name
-        logging.info( "TWITTER\tNew Tweet %s/%s re: %s" % (screen_name, twt_id, article_slug) )
+        log.info( "TWITTER\tNew Tweet %s/%s re: %s" % (screen_name, twt_id, article_slug) )
 
       # format data
         value = {
@@ -80,24 +82,20 @@ def parse_tweet(tweet_arg_set):
         db.zadd(article_slug, time_bucket, value)
 
 def parse_tweets(tweet_arg_sets):
-    if DEBUG:
-      for tweet_arg_set in tweet_arg_sets:
-        parse_tweet(tweet_arg_set)
-    else:
-      threaded(tweet_arg_sets, parse_tweet, 30, 200)
+  threaded_or_serial(tweet_arg_sets, parse_tweet, 30, 200)
 
 def run(config):
-    try:
-        tweet_arg_sets = [
-          (slug, t, config) 
-          for l in twt.get_list_timelines(config) 
-          for slug, tweets in l.iteritems()
-          for t in tweets
-        ]
-    except tweepy.error.TweepError as e:
-        print e
-    else:
-        return parse_tweets(tweet_arg_sets)
+  try:
+    tweet_arg_sets = [
+      (slug, t, config) 
+      for l in twt.get_list_timelines(config) 
+      for slug, tweets in l.iteritems()
+      for t in tweets
+    ]
 
-if __name__ == '__main__':
-  run()
+  except tweepy.error.TweepError as e:
+    log.error(e)
+
+  else:
+    parse_tweets(tweet_arg_sets)
+

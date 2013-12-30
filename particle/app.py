@@ -12,10 +12,12 @@ from particle.rssfeeds import rssfeeds
 from particle.facebook import fb
 from particle.twitter import twt
 from particle.common import DEBUG, db
-from particle.helpers import current_datetime
+from particle.helpers import *
 
 urllib3_logger = logging.getLogger('urllib3')
 urllib3_logger.setLevel(logging.CRITICAL)
+
+log = logging.getLogger('particle')
 
 class Particle:
   def __init__(self, filepath, config=None):
@@ -27,7 +29,7 @@ class Particle:
       elif filepah.endswith('.json'):
         self.CONFIG = json.load(open(filepath))
     elif isinstance(config, dict):
-        self.CONFIG = config
+      self.CONFIG = config
 
     # generate extended access token     
     self.CONFIG = fb.generate_extended_access_token(self.CONFIG)
@@ -54,7 +56,7 @@ class Particle:
     if isinstance(tasks, basestring):
       tasks = [tasks]
 
-    threaded(tasks, self._execute, num_threads= num_threads,  max_queue = max_queue)
+    threaded_or_serial(tasks, self._execute, num_threads, max_queue)
 
     def __repr__(self):
         return '<Particle>'

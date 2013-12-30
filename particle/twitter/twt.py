@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import tweepy
-from thready import threaded
 import logging
 
-from particle.common import DEBUG
+from particle.helpers import *
+
+log = logging.getLogger('particle')
 
 def connect(config):
   """
@@ -38,10 +39,10 @@ def add_list_member(list_member_arg_set):
     )
 
   except:
-    logging.info( "%s doesn't exist" % screen_name )
+    log.info( "%s doesn't exist" % screen_name )
 
   else:
-    logging.info( "TWT\tadding %s to list: %s for user: %s" % (screen_name, slug, owner_screen_name) )
+    log.info( "TWT\tadding %s to list: %s for user: %s" % (screen_name, slug, owner_screen_name) )
 
 
 def generate_list(api, slug, list_dict):
@@ -64,8 +65,8 @@ def generate_list(api, slug, list_dict):
 
   except tweepy.error.TweepError as e:
     
-    logging.error( "ERROR\tTWT\t%s Already Exists for user %s" % (slug, owner_screen_name) )
-    logging.error( e )
+    log.error( "ERROR\tTWT\t%s Already Exists for user %s" % (slug, owner_screen_name) )
+    log.error( e )
     return None
 
   else:
@@ -81,7 +82,8 @@ def generate_list(api, slug, list_dict):
       (screen_name, slug, owner_screen_name, api) 
       for screen_name in screen_names if screen_name not in members
     ]
-    threaded(list_member_arg_sets, add_list_member, 30, 200)
+
+    threaded_or_serial(list_member_arg_sets, add_list_member, 30, 200)
 
 
 def generate_lists(config):
@@ -89,7 +91,7 @@ def generate_lists(config):
   api = connect(config)
   for slug, list_dict in config['twitter']['lists'].iteritems():
     if list_dict.has_key('screen_names'):
-      logging.info('TWITTER\tupdating list %s' % slug)
+      log.info('TWITTER\tUpdating list %s' % slug)
       generate_list(api, slug, list_dict)
 
 
@@ -97,7 +99,7 @@ def get_list_timelines(config):
   api = connect(config)
   list_list = []
   for slug, list_dict in config['twitter']['lists'].iteritems():
-    logging.info( "TWITTER\tgetting new data for twitter.com/%s/lists/%s" % (list_dict['owner'], slug) )
+    log.info( "TWITTER\tGetting new data for twitter.com/%s/lists/%s" % (list_dict['owner'], slug) )
     tweets = api.list_timeline(
             owner_screen_name = list_dict['owner'], 
             slug =  slug,

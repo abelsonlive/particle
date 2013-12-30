@@ -14,6 +14,7 @@ from particle.common import db, DEBUG
 from particle.rssfeeds.article_extractor import extract_article
 from particle.helpers import *
 
+log = logging.getLogger('particle')
 
 def parse_rss_date(entry):
   if entry.has_key('updated_parsed'):
@@ -69,6 +70,7 @@ def parse_one_entry(entry_arg_set):
       # parse_title
       if entry.has_key('title'):
         rss_title = entry['title']
+
       else:
         rss_title = None
 
@@ -104,7 +106,7 @@ def parse_one_entry(entry_arg_set):
       )
       
       value = json.dumps({data_source: complete_datum})
-      logging.info( "RSSFEEDS\tNew post on %s re: %s" % (data_source, article_slug) )
+      log.info( "RSSFEEDS\tNew post on %s re: %s" % (data_source, article_slug) )
       
       # upsert the data
       upsert_rss_pub(article_url, article_slug, value)
@@ -121,12 +123,7 @@ def parse_one_feed(feed_arg_set):
   entries = feed_data['entries']
   entry_arg_sets = [(entry, data_source, full_text, config) for entry in entries]
 
-  if DEBUG:
-    for entry_arg_set in entry_arg_sets:
-      parse_one_entry(entry_arg_set)
-  else:
-    # thread that shit!
-    threaded(entry_arg_sets, parse_one_entry, 30, 100)
+  threaded_or_serial(entry_arg_sets, parse_one_entry, 30, 100)
 
 def run(config):
   """
@@ -138,9 +135,5 @@ def run(config):
     feed_arg = (v['feed_url'], data_source, v['full_text'], config)
     feed_arg_sets.append(feed_arg)
 
-  if DEBUG:
-    for feed_arg_set in feed_arg_sets:
-      parse_one_feed(feed_arg_set)
-  else:
-    # thread that shit!
-    threaded(feed_arg_sets, parse_one_feed, 5, 25)
+  # thread that shit!
+  threaded_or_serial(feed_arg_sets, parse_one_feed, 5, 25)
