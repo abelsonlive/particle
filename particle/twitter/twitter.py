@@ -24,9 +24,10 @@ def parse_tweet(tweet_arg_set):
 
     # if not, add id to id_set
     db.sadd('twitter_twt_ids', twt_id)
+    
     # check for relevant urls
     raw_urls = [u['expanded_url'] for u in t.entities['urls']]
-    
+
     if any([is_article(u, config) for u in raw_urls]):
 
       # parse urls
