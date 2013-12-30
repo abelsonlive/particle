@@ -1,26 +1,26 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='particle',
-    version='0.0.7',
-    description="",
-    long_description="",
-    classifiers=[
+    name = 'particle',
+    version = '0.0.7',
+    description = "",
+    long_description = "",
+    classifiers = [
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         ],
-    keywords='analytics, data science, social media',
-    author='Brian Abelson',
-    author_email='brianabelson@gmail.com',
-    url='http://github.com/abelsonlive/particle',
-    license='MIT',
-    packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
-    namespace_packages=[],
-    include_package_data=False,
-    zip_safe=False,
+    keywords = 'analytics, data science, social media',
+    author = 'Brian Abelson',
+    author_email = 'brianabelson@gmail.com',
+    url = 'http://github.com/abelsonlive/particle',
+    license = 'MIT',
+    packages = find_packages(exclude=['ez_setup', 'examples', 'tests']),
+    namespace_packages = [],
+    include_package_data = False,
+    zip_safe = False,
     install_requires = [
         "PyYAML >= 3.10",
         "charade >= 1.0.3",
@@ -37,7 +37,7 @@ setup(
         "boilerpipe >= 1.2.0.0",
         "Flask >= 0.10.1"
     ],
-    tests_require=[],
+    tests_require = [],
         entry_points = {
           'console_scripts': [
                 'particle = particle:cli', 

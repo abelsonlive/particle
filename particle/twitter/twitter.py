@@ -15,6 +15,7 @@ TWT_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 log = logging.getLogger('particle')
 
+
 def parse_tweet(tweet_arg_set):
   slug, t, config = tweet_arg_set
 
@@ -83,8 +84,10 @@ def parse_tweet(tweet_arg_set):
         # add data to redis
         db.zadd(article_slug, time_bucket, value)
 
+
 def parse_tweets(tweet_arg_sets):
   threaded_or_serial(tweet_arg_sets, parse_tweet, 30, 200)
+
 
 def run(config):
   try:
