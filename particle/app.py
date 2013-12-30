@@ -31,8 +31,9 @@ class Particle:
     elif isinstance(config, dict):
       self.CONFIG = config
 
-    # generate extended access token     
-    self.CONFIG = fb.generate_extended_access_token(self.CONFIG)
+    if self.CONFIG.has_key('facebook'):
+      # generate extended access token     
+      self.CONFIG = fb.generate_extended_access_token(self.CONFIG)
 
     # generate twitter list
     twt.generate_lists(self.CONFIG)
