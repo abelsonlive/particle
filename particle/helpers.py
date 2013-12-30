@@ -134,8 +134,9 @@ def parse_url(url):
   return  "%s://%s%s" % (o.scheme, o.netloc, o.path)
 
 def is_article(link_url, config):
-  patterns = config['global']['content_regexes'] + \
-             config['global']['short_regexes']
+  patterns = config['global']['content_regexes']
+  if config['global'].has_key('short_regexes'):
+    patterns += config['global']['short_regexes']
 
   if len(patterns)>0:
     return any([re.search(pattern, link_url) for pattern in patterns])
