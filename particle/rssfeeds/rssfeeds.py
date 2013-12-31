@@ -76,7 +76,7 @@ def parse_one_entry(entry_arg_set):
 
       # parse content
       if entry.has_key('summary'):
-        rss_content = entry['summary']
+        rss_content = strip_tags(entry['summary'])
       else:
         rss_content = None
 
