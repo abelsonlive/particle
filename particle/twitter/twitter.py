@@ -86,7 +86,7 @@ def parse_tweet(tweet_arg_set):
 
 
 def parse_tweets(tweet_arg_sets):
-  threaded_or_serial(tweet_arg_sets, parse_tweet, 30, 200)
+  threaded_or_serial(tweet_arg_sets, parse_tweet, 5, 200)
 
 
 def run(config):

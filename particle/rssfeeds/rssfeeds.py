@@ -152,4 +152,4 @@ def run(config):
     feed_arg_sets.append(feed_arg)
 
   # thread that shit!
-  threaded_or_serial(feed_arg_sets, parse_one_feed, 30, 100)
+  threaded_or_serial(feed_arg_sets, parse_one_feed, 5, 100)

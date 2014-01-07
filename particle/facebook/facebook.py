@@ -156,7 +156,6 @@ def insert_new_post(post_arg_set):
           
         # always insert insights data
         if is_insights(page_id, config):
-          print page_id, "INSIGHTS"
           
           log.info( "INSIGHTS\tAdding data from %s re: %s" % (page_id, article_slug) )
 
@@ -246,5 +245,5 @@ def run(config):
   api = fb.connect(config)
   page_arg_sets = [(api, page_id, config) for page_id in set(page_ids)]
   
-  threaded_or_serial(page_arg_sets, get_new_data_for_page, 30, 100)
+  threaded_or_serial(page_arg_sets, get_new_data_for_page, 5, 100)
 

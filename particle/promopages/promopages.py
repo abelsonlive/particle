@@ -161,5 +161,5 @@ def scrape_promo_page(page_arg_set):
 def run(config):
   pages = config['promopages']
   page_arg_sets = [(url, slug, config) for slug, url in pages.iteritems()] 
-  threaded_or_serial(page_arg_sets, scrape_promo_page, 30, 100)
+  threaded_or_serial(page_arg_sets, scrape_promo_page, 5, 100)
 

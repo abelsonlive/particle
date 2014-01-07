@@ -197,7 +197,7 @@ def parse_url(url):
   return  "%s://%s%s" % (o.scheme, o.netloc, o.path)
 
 def is_article(link_url, config):
-  patterns = [p for p in config['global']['content_regexes'] if p != '' and p is not None]
+  patterns = [str(p) for p in config['global']['content_regexes'] if p != '' and p is not None]
 
   if len(patterns)>0:
     return any([re.search(p, link_url) for p in patterns])

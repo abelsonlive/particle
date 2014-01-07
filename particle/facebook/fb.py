@@ -52,6 +52,7 @@ def generate_extended_access_token(config):
 
         config['facebook']['stable_access_token'] = token
         config['facebook']['stable_access_token_expires_at'] =  int(expires_at.strftime("%s"))
+        
         log.info("FACEBOOK\tThis is your new stable facebook access token: %s" % token)
         log.info("FACEBOOK\tIt will expire on %s" % expires_at.strftime("%s"))
         
