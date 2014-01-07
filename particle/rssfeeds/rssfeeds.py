@@ -39,77 +39,86 @@ def parse_one_entry(entry_arg_set):
   entry, data_source, full_text, config = entry_arg_set
 
   # open url to get actual link
-  r = requests.get(entry['link'])
-  if r.status_code == 200:
-    # parse and sluggify url
-    article_url = parse_url(r.url)
-    article_slug = sluggify(article_url)
+  if entry.has_key('link') and entry['link'] != '' and entry['link'] is not None:
+    r = requests.get(entry['link'])
+    if r.status_code == 200:
+      # parse and sluggify url
+      article_url = parse_url(r.url)
+      article_slug = sluggify(article_url)
 
-  else:
-    article_url = None
-    article_slug = None
+    else:
+      article_url = None
+      article_slug = None
 
-  # check if this is a relevant article
-  if is_article(article_url, config):
-    
-    # check if this key exists
-    if not db.exists(article_slug + ":article"):
-
-      # parse date
-      dt = parse_rss_date(entry)
-      if dt is not None:
-        time_bucket = round_datetime(dt, config)
-        raw_timestamp = int(dt.strftime('%s'))
-        pub_date = dt.strftime('%Y-%m-%d %H:%M:%S')
-
-      else:
-        time_bucket = gen_time_bucket(config)
-        raw_timestamp = current_timestamp(config)
-        pub_date = None
-
-      # parse_title
-      if entry.has_key('title'):
-        rss_title = entry['title']
-
-      else:
-        rss_title = None
-
-      # parse content
-      if entry.has_key('summary'):
-        rss_content = strip_tags(entry['summary'])
-      else:
-        rss_content = None
-
-      # rss datum
-      rss_datum = dict(
-        article_slug = article_slug,
-        article_url = article_url,
-        time_bucket = time_bucket,
-        raw_timestamp = raw_timestamp,
-        rss_pub_date = pub_date,
-        rss_raw_link = r.url,
-        rss_title = rss_title,
-        rss_content = rss_content
-      )
-
-    # if feed is not full text, extract the article content
-      # by crawling the page
-      if not full_text:
-        article_datum = extract_article(article_url)
-      else:
-        article_datum = {}
-
-      # merge data
-      complete_datum = dict(
-        rss_datum.items() + 
-        article_datum.items()
-      )
+    # check if this is a relevant article
+    if is_article(article_url, config):
       
-      value = json.dumps({data_source: complete_datum})
-      log.info( "RSSFEEDS\tNew post on %s re: %s" % (data_source, article_slug) )
-      
-      # upsert the data
-      upsert_rss_pub(article_url, article_slug, value)
+      # check if this key exists
+      if not db.exists(article_slug + ":article"):
+
+        # parse date
+        dt = parse_rss_date(entry)
+        if dt is not None:
+          time_bucket = round_datetime(dt, config)
+          raw_timestamp = int(dt.strftime('%s'))
+          pub_date = dt.strftime('%Y-%m-%d %H:%M:%S')
+
+        else:
+          time_bucket = gen_time_bucket(config)
+          raw_timestamp = current_timestamp(config)
+          pub_date = None
+
+        # parse_title
+        if entry.has_key('title'):
+          rss_title = entry['title']
+
+        else:
+          rss_title = None
+
+        # parse content
+        if entry.has_key('summary'):
+          rss_content = strip_tags(entry['summary'])
+          rss_html = entry['summary']
+        else:
+          rss_content = None
+
+      # if feed is not full text, extract the article content
+        # by crawling the page
+        if not full_text:
+          article_datum = extract_article(article_url, config)
+          extracted_urls = extract_urls(article_datum['extracted_html'], config, False)
+          extracted_imgs = extract_imgs(article_datum['extracted_html'])
+        else:
+          article_datum = {}
+          extracted_urls = extract_urls(rss_html, config, False)
+          extracted_imgs = extract_imgs(rss_html)
+
+        # rss datum
+        rss_datum = dict(
+          article_slug = article_slug,
+          article_url = article_url,
+          time_bucket = time_bucket,
+          raw_timestamp = raw_timestamp,
+          rss_pub_date = pub_date,
+          rss_raw_link = r.url,
+          rss_title = rss_title,
+          rss_content = rss_content,
+          rss_html = rss_html,
+          extracted_urls = extracted_urls,
+          extracted_imgs = extracted_imgs
+        )
+        
+        # merge data
+        complete_datum = dict(
+          rss_datum.items() + 
+          article_datum.items()
+        )
+
+        value = json.dumps({data_source: complete_datum})
+        log.info( "RSSFEEDS\tNew post on %s\t%s" % (data_source, article_url) )
+        
+        # upsert the data
+        upsert_rss_pub(article_url, article_slug, value)
   
 
 def parse_one_feed(feed_arg_set):
@@ -130,10 +139,17 @@ def run(config):
   parse all teh feedz
   """
   # generate args from config
+  if not isinstance(config['rssfeeds'], dict):
+    raise ParticleConfigException("""'rssfeeds' field must be a set of key/value pairs.
+
+      """)
+
   feed_arg_sets = []
-  for data_source,v in config['rssfeeds'].iteritems():
+  for data_source, v in config['rssfeeds'].iteritems():
+    if not v.has_key('full_text'):
+      v['full_text'] = False
     feed_arg = (v['feed_url'], data_source, v['full_text'], config)
     feed_arg_sets.append(feed_arg)
 
   # thread that shit!
-  threaded_or_serial(feed_arg_sets, parse_one_feed, 5, 25)
+  threaded_or_serial(feed_arg_sets, parse_one_feed, 30, 100)

@@ -20,23 +20,16 @@ urllib3_logger.setLevel(logging.CRITICAL)
 log = logging.getLogger('particle')
 
 class Particle:
-  def __init__(self, filepath, config=None):
+  def __init__(self, config, tasks=None):
 
-    # initialize CONFIG
-    if config is None:
-      if filepath.endswith('.yml'):
-        self.CONFIG = yaml.safe_load(open(filepath))
-      elif filepah.endswith('.json'):
-        self.CONFIG = json.load(open(filepath))
-    elif isinstance(config, dict):
-      self.CONFIG = config
+    self.CONFIG , self.TASKS = load_and_validate_config(config)
+    if tasks is not None:
+      self.TASKS = tasks
 
-    if self.CONFIG.has_key('facebook'):
-      # generate extended access token     
-      self.CONFIG = fb.generate_extended_access_token(self.CONFIG)
-
-    # generate twitter list
-    twt.generate_lists(self.CONFIG)
+    if 'twitter' in self.TASKS:
+      twt.generate_lists(self.CONFIG)
+    if 'facebook' in self.TASKS:
+      fb.generate_extended_access_token(self.CONFIG)
 
   def _execute(self, task):
     if task=="twitter":
@@ -49,15 +42,10 @@ class Particle:
       promopages.run(self.CONFIG)
 
   def run(self, 
-          tasks=["twitter", "facebook", "rssfeeds", "promopages"], 
           num_threads=4, 
           max_queue=4):
     
-    # check if tasks is not a list
-    if isinstance(tasks, basestring):
-      tasks = [tasks]
-
-    threaded_or_serial(tasks, self._execute, num_threads, max_queue)
+    threaded_or_serial(self.TASKS, self._execute, num_threads, max_queue)
 
     def __repr__(self):
-        return '<Particle>'
+        return '<Particle Object>'

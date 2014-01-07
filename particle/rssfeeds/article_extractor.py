@@ -9,7 +9,8 @@ from particle.helpers import *
 import logging
 
 
-def extract_article(url):
+def extract_article(url, config):
+  
   r = requests.get(url)
   
   # the the url exists, continue
@@ -27,11 +28,11 @@ def extract_article(url):
     # run readability
     Rdb = Document(html)
 
-    html = Rdb.summary()
     # return article data
     return {
       'extracted_title': Rdb.short_title().strip(),
-      'extracted_content': strip_tags(BP.getText())
+      'extracted_content': strip_tags(BP.getText()),
+      'extracted_html': Rdb.summary()
     }
 
   # otherwise return an empty dict

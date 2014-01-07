@@ -12,6 +12,9 @@ from pprint import pprint
 import string
 import json
 import logging
+import sys
+import yaml
+from bs4 import BeautifulSoup
 from thready import threaded
 
 from particle.common import DEBUG
@@ -20,6 +23,66 @@ requests_logger = logging.getLogger('requests')
 requests_logger.setLevel(logging.CRITICAL)
 
 log = logging.getLogger('particle')
+
+# config validation
+req_items = {
+  'global': ['bucket', 'newsroom_timezone', 'phantomjs', 'content_regexes'],
+  'facebook': ['app_id', 'app_secret', 'temp_access_token', 'page_limit', 'pages'],
+  'twitter': ['access_token', 'access_token_secret', 'consumer_key', 'consumer_secret', 'lists']
+}
+
+class ParticleConfigException(Exception):
+    pass
+
+def raise_error_message(message):
+    err_message = """%s
+      See the documentation at http://particle.rtfd.org/""" % message
+
+    raise ParticleConfigException(err_message)
+
+def raise_missing_items_error_message(field, missing_items):
+    message = """
+        The config's '%s' field  must include items for: 
+        %s.""" % (field, ", ".join( missing_items)) 
+    raise_error_message(message)
+
+def validate_items(config, field):
+  return [r for r in req_items[field] if r not in config[field].keys()]
+
+def validate_field(config, field):
+  if req_items.has_key(field):
+    missing_items = validate_items(config, field)
+    if len( missing_items) > 0 :
+      raise_missing_items_error_message(field, missing_items)
+
+def load_config(config):
+    # initialize CONFIG
+    if isinstance(config, basestring):
+      if config.endswith('.yml'):
+        c = yaml.safe_load(open(config))
+      elif config.endswith('.json'):
+        c = json.load(open(config))
+    elif isinstance(config, dict):
+      c = config
+    else:
+      raise raise_error_message('config must be a filepath or a dictionary.')
+
+    return c
+  
+def load_and_validate_config(config):
+  config = load_config(config)
+  tasks = config.keys()
+
+  if 'global' not in tasks:
+    raise raise_error_message("The config must include a 'global' field.")
+  
+  else:
+    for field in tasks:
+      validate_field(config, field)
+    
+  # return list of tasks
+  tasks = [ t for t in tasks if t != 'global' ]
+  return config, tasks
 
 # wrapper for thready
 def threaded_or_serial(tasks, func, num_threads, max_queue):
@@ -134,12 +197,10 @@ def parse_url(url):
   return  "%s://%s%s" % (o.scheme, o.netloc, o.path)
 
 def is_article(link_url, config):
-  patterns = config['global']['content_regexes']
-  if config['global'].has_key('short_regexes'):
-    patterns += config['global']['short_regexes']
+  patterns = [p for p in config['global']['content_regexes'] if p != '' and p is not None]
 
   if len(patterns)>0:
-    return any([re.search(pattern, link_url) for pattern in patterns])
+    return any([re.search(p, link_url) for p in patterns])
   else:
     return True
 
@@ -238,9 +299,10 @@ def is_facebook_link(link):
     return False
 
 def test_for_short_link(link, config):
-  patterns = config['global']['short_regexes']
-  if any([re.search(p, link) for p in patterns]):
-    return True
+  if config['global'].has_key('short_regexes'):
+    patterns = config['global']['short_regexes']
+    if any([re.search(p, link) for p in patterns]):
+      return True
   elif is_short_link(link):
     return True
   else:
@@ -289,10 +351,30 @@ def unshorten_link(link, config):
   else:
     return link
 
-def extract_url(s, config):
+def extract_urls(string, config, text=True):
     """
     get urls from input string
     """
-    pattern = "(https?://[^\s]+)"
-    return [unshorten_link(l, config) for l in re.findall(pattern, s) if len(l)>5]
+    if string is not None:
+      if text:
+        p = "(https?://|([a-z]+\.[a-z]+)[^\s\'\"]+)"
+        return list(set([parse_url(unshorten_link(l, config)) for l in re.findall(p, string) if len(l)>6]))
+      
+      else:
+        soup = BeautifulSoup(string)
+        links = []
+        for a in soup.find_all('a'):
+          if a.has_key('href') and a.attrs['href'] != '':
+            link = parse_url(unshorten_link(a.attrs['href'], config))
+            links.append(link)
 
+        return list(set(links))
+
+def extract_imgs(string):
+    soup = BeautifulSoup(string)
+    imgs = []
+    for i in soup.find_all('img'):
+      if i.has_key('src') and i.attrs['src'] != '':
+        imgs.append(i.attrs['src'])
+
+    return list(set(imgs))

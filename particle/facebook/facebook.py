@@ -21,7 +21,10 @@ def is_insights(page_id, config):
   """
   Determine whether we can collect insights for a page
   """
-  return page_id in set(config['facebook']['insights_pages'])
+  if config.has_key('insights_pages'):
+    return False
+  else:
+    return page_id in set(config['facebook'])
 
 
 def get_fb_link(post_data, config, unshorten=False):
@@ -47,7 +50,7 @@ def parse_message_urls(message, config):
   parse facebook message for links
   """
   if message is not None:
-    message_urls = extract_url(message, config)
+    message_urls = extract_urls(message, config)
     if len(message_urls)>0:
       return [u for u in message_urls]
     else:
@@ -125,10 +128,12 @@ def insert_new_post(post_arg_set):
 
     # detect article links, unshorten and parse
     article_urls = [
-      parse_url(unshorten_link(article_url, config)) \
-      for article_url in article_urls + message_urls
-      if article_url is not None and is_article(article_url, config)
+      parse_url(unshorten_link(url, config)) \
+      for url in article_urls + message_urls
+      if url is not None
     ]
+
+    article_urls = [url for url in article_urls if is_article(url, config)]
 
     if article_urls:
       for article_url in set(article_urls):
@@ -181,7 +186,7 @@ def insert_new_post(post_arg_set):
         # only insert new posts
         elif not db.sismember('facebook_post_ids', post_id):
           
-          logging.info( "FACEBOOK\tNew post %s re: %s" % (post_id, article_slug) )
+          log.info( "FACEBOOK\tNew post %s\t%s" % (post_id, article_url) )
           
           # insert id
           db.sadd('facebook_post_ids', post_id)     
@@ -214,16 +219,23 @@ def get_new_data_for_page(page_arg_set):
     return None
   else:
     # determine limit
-    if page_id in config['facebook']['insights_pages']:
-      limit = config['facebook']['insights_limit']
-    else:
-      limit = config['facebook']['page_limit']
+    if is_insights(page_id, config):
+      if config['facebook'].has_key('insights_limit'):
+        limit = config['facebook']['insights_limit']
+      else:
+        limit = 200
 
-    # get last 100 articles for this page
+    else:
+      if config['facebook'].has_key('page_limit'):
+        limit = config['facebook']['page_limit']
+      else:
+        limit = 10
+
+    # get last {limit} articles for this page
     page = api.get(page_id + "/posts", page=False, retry=5, limit=limit)
     post_arg_sets = [(api, post_data, acct_data, page_id, config) for post_data in page['data']]
     
-    threaded_or_serial(post_arg_sets, insert_new_post, 20, 150)
+    threaded_or_serial(post_arg_sets, insert_new_post, 30, 200)
 
 
 def run(config):
@@ -232,7 +244,7 @@ def run(config):
   """
   page_ids = config['facebook']['pages']
   api = fb.connect(config)
-  page_arg_sets = [(api, page_id, config) for page_id in page_ids]
+  page_arg_sets = [(api, page_id, config) for page_id in set(page_ids)]
   
-  threaded_or_serial(page_arg_sets, get_new_data_for_page, 5, 20)
+  threaded_or_serial(page_arg_sets, get_new_data_for_page, 30, 100)
 

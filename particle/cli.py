@@ -10,9 +10,9 @@ from particle.app import Particle
 
 # sub-command functions
 def particle_runner(args):
-  tasks = args.tasks.split(',')
-  particle = Particle(filepath=args.config)
-  particle.run(tasks = tasks)
+  tasks = [t for t in args.tasks.split(',') if t != '' and t is not None]
+  particle = Particle(config=args.config, tasks=tasks)
+  particle.run()
 
 def api_runner(args):
   api(port = args.port, debug = args.debug)

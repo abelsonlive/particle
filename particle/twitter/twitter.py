@@ -29,10 +29,10 @@ def parse_tweet(tweet_arg_set):
     # check for relevant urls
     raw_urls = [u['expanded_url'] for u in t.entities['urls']]
 
-    if any([is_article(u, config) for u in raw_urls]):
+    # parse urls
+    article_urls = set([parse_url(unshorten_link(u, config)) for u in raw_urls])
 
-      # parse urls
-      article_urls = set([parse_url(unshorten_link(u, config)) for u in raw_urls])
+    if any([is_article(u, config) for u in article_urls]):
 
       # parse dates
       # sometimes t.created_at is a datetime object
@@ -51,7 +51,7 @@ def parse_tweet(tweet_arg_set):
         # sluggify url
         article_slug = sluggify(article_url)
         screen_name = t.user.screen_name
-        log.info( "TWITTER\tNew Tweet %s/%s re: %s" % (screen_name, twt_id, article_slug) )
+        log.info( "TWITTER\tNew Tweet %s/%s\t%s" % (screen_name, twt_id, article_url) )
 
       # format data
         value = {
