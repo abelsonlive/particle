@@ -21,10 +21,10 @@ def is_insights(page_id, config):
   """
   Determine whether we can collect insights for a page
   """
-  if config.has_key('insights_pages'):
-    return False
+  if config['facebook'].has_key('insights_pages'):
+    return page_id in set(config['facebook']['insights_pages'])
   else:
-    return page_id in set(config['facebook'])
+    return False
 
 
 def get_fb_link(post_data, config, unshorten=False):
@@ -105,11 +105,7 @@ def insert_new_post(post_arg_set):
     log.error( e )
 
   else:
-    if is_insights(page_id, config):
-      insights_value = get_insights_data(api, page_id, post_id)
-    else:
-      insights_value = {}
-    
+
     # parse date
     if post_data.has_key('created_time') and post_data['created_time'] is not None:  
       dt = datetime.strptime(post_data['created_time'], FB_DATE_FORMAT)
@@ -160,9 +156,14 @@ def insert_new_post(post_arg_set):
           
         # always insert insights data
         if is_insights(page_id, config):
+          print page_id, "INSIGHTS"
           
           log.info( "INSIGHTS\tAdding data from %s re: %s" % (page_id, article_slug) )
-          # 
+
+          # fetch data
+          insights_value = get_insights_data(api, page_id, post_id)
+
+          # create datasource name
           data_source = "facebook_insights_%s" % page_id 
           
           # upsert url
@@ -184,7 +185,7 @@ def insert_new_post(post_arg_set):
           db.zadd(article_slug, current_time_bucket, value)        
             
         # only insert new posts
-        elif not db.sismember('facebook_post_ids', post_id):
+        if not db.sismember('facebook_post_ids', post_id):
           
           log.info( "FACEBOOK\tNew post %s\t%s" % (post_id, article_url) )
           
@@ -195,9 +196,8 @@ def insert_new_post(post_arg_set):
           data_source = "facebook_%s" % page_id
           upsert_url(article_url, article_slug, data_source, config)
 
-          value = json.dumps({
-            data_source : dict(post_value.items() + insights_value.items())
-          })
+          value = json.dumps( {data_source : post_value} )
+
 
           # upload data to redis
           db.zadd(article_slug, time_bucket, value)

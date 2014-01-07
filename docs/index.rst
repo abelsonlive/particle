@@ -23,7 +23,7 @@ This one function will set up your ``particle`` project and deal with any necess
 
 Now you're all set to run ``particle``::
 
-  p.run(tasks=['twitter', 'facebook', 'promopages', 'rssfeeds'])
+  p.run()
 
 Alternatively, you can run this same sequence of functions via the command line interface:
 

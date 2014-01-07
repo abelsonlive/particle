@@ -10,6 +10,8 @@ import logging
 
 from particle.common import DEBUG
 
+log = logging.getLogger('particle')
+
 def connect(config):
     return facepy.GraphAPI(config['facebook']['stable_access_token'])
 
@@ -24,12 +26,10 @@ def generate_extended_access_token(config):
     Returns a tuple with a string describing the extended access token and a datetime instance
     describing when it expires.
     """
-    tests = [
-        not config['facebook'].has_key('stable_access_token'),
-        config['facebook']['stable_access_token'] is None
 
-    ]
-    if any(tests):
+    if not config['facebook'].has_key('stable_access_token') or \
+       config['facebook']['stable_access_token'] is None:
+
         # access tokens
         default_access_token = facepy.get_application_access_token(
             application_id = config['facebook']['app_id'],  
@@ -50,10 +50,11 @@ def generate_extended_access_token(config):
         token = components['access_token'][0]
         expires_at = datetime.now() + timedelta(seconds=int(components['expires'][0]))
 
-        config['facebook'].pop('stable_access_token', token)
-        config['facebook'].pop('stable_access_token_expires_at', int(expires_at.strftime("%s")))
-        print "INFO: This is your new stable facebook access token: %s" % token
-        print "INFO: It will expire on %s" % expires_at.strftime("%Y-%m-%d")
+        config['facebook']['stable_access_token'] = token
+        config['facebook']['stable_access_token_expires_at'] =  int(expires_at.strftime("%s"))
+        log.info("FACEBOOK\tThis is your new stable facebook access token: %s" % token)
+        log.info("FACEBOOK\tIt will expire on %s" % expires_at.strftime("%s"))
+        
         return config
 
     else:

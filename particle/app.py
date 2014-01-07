@@ -22,14 +22,14 @@ log = logging.getLogger('particle')
 class Particle:
   def __init__(self, config, tasks=None):
 
-    self.CONFIG , self.TASKS = load_and_validate_config(config)
+    self.CONFIG, self.TASKS = load_and_validate_config(config)
     if tasks is not None:
       self.TASKS = tasks
 
     if 'twitter' in self.TASKS:
       twt.generate_lists(self.CONFIG)
     if 'facebook' in self.TASKS:
-      fb.generate_extended_access_token(self.CONFIG)
+      self.CONFIG = fb.generate_extended_access_token(self.CONFIG)
 
   def _execute(self, task):
     if task=="twitter":
