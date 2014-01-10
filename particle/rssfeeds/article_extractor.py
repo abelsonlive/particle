@@ -9,7 +9,7 @@ from particle.helpers import *
 import logging
 
 
-def extract_article(url, config):
+def extract_article(url):
   
   r = requests.get(url)
   
@@ -37,4 +37,8 @@ def extract_article(url, config):
 
   # otherwise return an empty dict
   else:
-    return {}
+    return {
+      'extracted_title': None,
+      'extracted_content': None,
+      'extracted_html': None
+    }

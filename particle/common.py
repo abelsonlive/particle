@@ -1,12 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import redis
+import dataset
 
 # GLOBAL settings
 DEBUG = False
-APP_DEBUG = True
 
 # initialize redis
-db = redis.StrictRedis(host='localhost', port=6379, db=0)
+db = dataset.connect('postgresql://brian:particle@localhost:5432/particle')
 
+urls_table = db['urls']
+fb_table = db['facebook']
+ins_table = db['insights']
+twt_table = db['twitter']
+pp_table = db['promopages']
+rss_table = db['rssfeeds']

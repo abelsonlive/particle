@@ -39,10 +39,10 @@ def add_list_member(list_member_arg_set):
     )
 
   except:
-    log.info( "%s doesn't exist" % screen_name )
+    log.info( "  < twitter > < list > < error > %s doesn't exist" % screen_name )
 
   else:
-    log.info( "TWT\tadding %s to list: %s for user: %s" % (screen_name, slug, owner_screen_name) )
+    log.info( "  < twitter > < list > < %s > adding %s" % (slug, screen_name) )
 
 
 def generate_list(api, slug, list_dict):
@@ -65,7 +65,7 @@ def generate_list(api, slug, list_dict):
 
   except tweepy.error.TweepError as e:
     
-    log.error( "ERROR\tTWT\t%s Already Exists for user %s" % (slug, owner_screen_name) )
+    log.error( "  < twitter > < list > < %s > already exists" % slug )
     log.error( e )
     return None
 
@@ -91,7 +91,7 @@ def generate_lists(config):
   api = connect(config)
   for slug, list_dict in config['twitter']['lists'].iteritems():
     if list_dict.has_key('screen_names'):
-      log.info('TWITTER\tUpdating list %s' % slug)
+      log.info(' < twitter > < list > < %s > updating' % slug)
       generate_list(api, slug, list_dict)
 
 
@@ -99,12 +99,12 @@ def get_list_timelines(config):
   api = connect(config)
   list_list = []
   for slug, list_dict in config['twitter']['lists'].iteritems():
-    log.info( "TWITTER\tGetting new data for twitter.com/%s/lists/%s" % (list_dict['owner'], slug) )
+    log.info( " < twitter > < list > < %s > getting new data" % slug )
     tweets = api.list_timeline(
-            owner_screen_name = list_dict['owner'], 
-            slug =  slug,
-            count = list_dict['limit']
-          )
+      owner_screen_name = list_dict['owner'], 
+      slug =  slug,
+      count = list_dict['limit']
+    )
     list_list.append({slug: [t for t in tweets]})
 
   return list_list

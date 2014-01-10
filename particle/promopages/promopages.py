@@ -9,14 +9,13 @@ from thready import threaded
 import json, yaml
 import socket
 
-from particle.common import db, DEBUG
+from particle.common import pp_table, DEBUG
 from particle.helpers import *
 
 log = logging.getLogger('particle')
 
 # set the socket timeout
 socket.setdefaulttimeout(20)
-
 
 def get_image_for_a_link(link):
   try:
@@ -63,7 +62,8 @@ def scrape_link(link_arg_set):
         pos_y = int(link.location['y'])
 
         if pos_x > 0 and pos_y > 0:
-          
+          # okay, let's record it
+
           # get image
           img_dict = get_image_for_a_link(link)
 
@@ -75,7 +75,7 @@ def scrape_link(link_arg_set):
           article_slug = sluggify(article_url)
 
           # scrape
-          log.info("PROMOPAGE\tLink detected on %s\t%s" % (promo_url, article_url))
+          log.info("  < promopage > < %s > %s" % (data_source, article_url))
 
           link_dict = {
             'article_slug' : article_slug,
@@ -90,19 +90,16 @@ def scrape_link(link_arg_set):
             'pp_pos_y' : pos_y
           }
 
-          value = json.dumps({data_source : dict(img_dict.items() + link_dict.items())})
+          data = dict(img_dict.items() + link_dict.items())          
 
-          # upsert url
-          upsert_url(article_url, article_slug, data_source, config)
-
-          # upload data to redis
-          db.zadd(article_slug, time_bucket, value)
+          # insert data
+          pp_table.insert(data)
 
 
 def scrape_links(links_arg_set):    
   
   b, promo_url, data_source, config = links_arg_set
-  log.info( "PROMOPAGE\t%s" % promo_url )
+  log.info( "  < promopages > < %s > fetching" % data_source )
   time_bucket = gen_time_bucket(config)
   links = b.find_elements_by_tag_name("a")
   link_arg_sets = [(promo_url, l, time_bucket, data_source, config) for l in links]

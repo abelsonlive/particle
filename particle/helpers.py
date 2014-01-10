@@ -3,7 +3,7 @@
 
 from datetime import datetime, timedelta
 import re
-from particle.common import db
+from particle.common import urls_table
 from HTMLParser import HTMLParser
 from urlparse import urlparse
 import pytz
@@ -165,28 +165,15 @@ def sluggify(url):
   return re.sub(r"\s+", "-", out).lower()
 
 def upsert_url(article_url, article_slug, data_source, config):
-  if not db.sismember('article_set', article_url):
-    # add it to the set
-    db.sadd('article_set', article_url)
-
-    # insert metadata
-    ts = current_timestamp(config)
-    value = json.dumps({
-      "url" : article_url,
-      "slug": article_slug,
-      "timestamp" : ts,
-      "data_source": data_source
-      })
-    
-    db.zadd('article_sorted_set', ts, value)
-
-def upsert_rss_pub(article_url, article_slug, value):
-  if not db.sismember('article_set', article_url):
-    # add it to the set
-    db.sadd('article_set', article_url)
-    
-  key = "%s:article" % article_slug
-  db.set(key, value)
+  # insert metadata
+  data = {
+    "url" : article_url,
+    "slug": article_slug,
+    "timestamp" : current_timestamp(config),
+    "data_source": data_source
+    }
+  
+  urls_table.upsert(data, ['url'])
 
 # urls
 def parse_url(url):

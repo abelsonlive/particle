@@ -7,7 +7,7 @@ from pprint import pprint
 from datetime import datetime
 import logging
 
-from particle.common import db, DEBUG
+from particle.common import fb_table, ins_table, DEBUG
 from particle.facebook import fb
 from particle.helpers import *
 
@@ -77,9 +77,8 @@ def get_insights_data(api, page_id, post_id):
   """
   graph_results = api.get(post_id + "/insights", page=False, retry=5)
   data = graph_results['data']
-  insights = {}
-  insights['includes_insights'] = True  
   
+  insights = {}
   for d in data:
     val = d['values'][0]['value']
     if isinstance(val, dict):
@@ -138,7 +137,7 @@ def insert_new_post(post_arg_set):
         article_slug = sluggify(article_url)
 
         # format data
-        post_value = {
+        data = {
           'article_slug': article_slug,
           'article_url': article_url,
           'time_bucket': time_bucket,
@@ -157,49 +156,41 @@ def insert_new_post(post_arg_set):
         # always insert insights data
         if is_insights(page_id, config):
           
-          log.info( "INSIGHTS\tAdding data from %s re: %s" % (page_id, article_slug) )
+          log.info( "  < insights > < %s > %s" % (page_id, article_url) )
 
           # fetch data
-          insights_value = get_insights_data(api, page_id, post_id)
+          insights = get_insights_data(api, page_id, post_id)
 
           # create datasource name
-          data_source = "facebook_insights_%s" % page_id 
+          data_source = "insights_%s" % page_id
+
+          # insert data_source
+          insights['data_source'] = data_source
           
-          # upsert url
-          upsert_url(article_url, article_slug, data_source, config)
-
-          # insert id
-          db.sadd('facebook_post_ids', post_id)
-
           # format time bucket
-          current_time_bucket = gen_time_bucket(config)
-          insights_value['time_bucket'] =  current_time_bucket
-          post_value.pop('time_bucket', None)
+          insights['time_bucket'] =  gen_time_bucket(config)
+          data.pop('time_bucket', None)
           
-          value = json.dumps({
-            data_source : dict(post_value.items() + insights_value.items())
-          })
+          data = dict(insights.items() + data.items())
+  
+          # upsert data
+          ins_table.upsert(data, ['fb_post_id', 'time_bucket'])        
+        
+        # upsert post...
+        
+        log.info( "  < facebook > < %s > %s" % (page_id, article_url) )
+        
+        # overwrite data_source
+        data_source = "facebook_%s" % page_id
 
-          # upload data to redis
-          db.zadd(article_slug, current_time_bucket, value)        
-            
-        # only insert new posts
-        if not db.sismember('facebook_post_ids', post_id):
-          
-          log.info( "FACEBOOK\tNew post %s\t%s" % (post_id, article_url) )
-          
-          # insert id
-          db.sadd('facebook_post_ids', post_id)     
-          
-          # upsert url
-          data_source = "facebook_%s" % page_id
-          upsert_url(article_url, article_slug, data_source, config)
+        # insert the data source
+        data['data_source'] = data_source
+        
+        # upsert url
+        upsert_url(article_url, article_slug, data_source, config)
 
-          value = json.dumps( {data_source : post_value} )
-
-
-          # upload data to redis
-          db.zadd(article_slug, time_bucket, value)
+        # upsert data
+        fb_table.upsert(data, ['fb_post_id'])
 
 
 def get_new_data_for_page(page_arg_set):
@@ -208,27 +199,20 @@ def get_new_data_for_page(page_arg_set):
   """
   api, page_id, config = page_arg_set
 
-  log.info( "FACEBOOK\tGetting new data for facebook.com/%s" % page_id )
+  log.info( "  < facebook > < %s > fetching" % page_id )
   
   # fetch account data so we can associate the number of likes with the account AT THAT TIME
   try:
     acct_data = api.get(page_id)
   except Exception as e:
-    log.error('FACEBOOK\t%s does not exist' % page_id)
+    log.error('  < facebook > < %s > does not exist' % page_id)
     return None
   else:
     # determine limit
     if is_insights(page_id, config):
-      if config['facebook'].has_key('insights_limit'):
-        limit = config['facebook']['insights_limit']
-      else:
-        limit = 200
-
+      limit = config['facebook'].get('insights_limit', 200)
     else:
-      if config['facebook'].has_key('page_limit'):
-        limit = config['facebook']['page_limit']
-      else:
-        limit = 10
+      limit = config['facebook'].get('page_limit', 10)
 
     # get last {limit} articles for this page
     page = api.get(page_id + "/posts", page=False, retry=5, limit=limit)
